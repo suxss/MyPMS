@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+
+    <title>登录页</title>
+    <link rel="stylesheet" href="layui/css/layui.css">
+    <link rel="stylesheet" href="css/style.css">
+    <script src="js/jquery.min.js"></script>
+
+</head>
+<body>
+
+<div class="login-main">
+    <header class="layui-elip">登录</header>
+    <form class="layui-form">
+        <center>
+            <div class="layui-form-item">
+                <!-- <div class="layui-input-block"> -->
+                <input type="radio" name="userType" value="0" title="采购员" checked>
+                <input type="radio" name="userType" value="1" title="供应商">
+                <!-- </div> -->
+            </div>
+        </center>
+<!--        </div>-->
+        <div class="layui-input-inline">
+            <input type="text" name="email" required lay-verify="required" placeholder="邮箱" autocomplete="off"
+                   class="layui-input">
+        </div>
+        <div class="layui-input-inline">
+            <input type="password" name="password" required lay-verify="required" placeholder="密码" autocomplete="off"
+                   class="layui-input">
+        </div>
+
+
+        <div class="layui-input-inline">
+            <div id="slider"></div>
+        </div>
+        <!-- 提交按钮 -->
+        <div class="layui-input-inline">
+            <div class="layui-btn" id="logBtn" style="width: 100%">登录</div>
+        </div>
+        <hr/>
+        <p>
+            <a href="p_register.html" class="fl">没有账号？立即注册</a>
+            <!-- <a href="javascript:;" class="fr">忘记密码？</a> -->
+        </p>
+    </form>
+</div>
+
+
+<script src="layui/layui.js"></script>
+<script type="text/javascript">
+    const v_login_path = "v/login";
+    const p_login_path = "p/login.html";
+    const v_index_path = "v/index.html";
+    const p_index_path = "p/index.html";
+
+    layui.config({
+            base: 'layui/myplugins/'
+        }
+    ).use(['sliderVerify', 'form', 'layer', 'jquery'], function () {
+        // 操作对象
+        var $ = layui.jquery
+            , sliderVerify = layui.sliderVerify
+            , layer = layui.layer
+            , slider = sliderVerify.render({
+                elem: '#slider',
+                onOk: function () {//当验证通过回调
+                    layer.msg("滑块验证通过");
+                }
+            });
+
+        $("#logBtn").on("click", function (data) {
+            const type = $('input:radio:checked').val()
+                , email = $('input[name="email"]').val()
+                , password = $('input[name="password"]').val()
+                , verfiy = slider.isOk();
+            let index_path
+                , login_path;
+            if (verfiy) {
+                login_path = "login";
+                fetch(login_path, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        email: email,
+                        password: password
+                    })
+                }).then(response => response.json())
+                        .then(function (data) {
+                            if (data.code === 0) {
+                                window.location.href = data.data.url;
+                            } else {
+                                layer.msg(data.msg);
+                            }
+                        }).catch(function (e) {
+                    layer.msg("网络错误");
+                })
+            }
+        })
+    });
+</script>
+</body>
+</html>

@@ -1,0 +1,28 @@
+.light-theme {
+    background-color: white!important;
+}
+.light-theme.layui-header li {
+    color: black!important;
+}
+.light-theme.layui-header li>a {
+    color: black!important;
+}
+
+.layui-layout-admin .layui-logo {
+    box-shadow: 0 0 0 0 rgb(0 0 0 / 15%)!important;
+}
+/*.layui-header {*/
+/*    background-color:  #393d49!important;*/
+/*}*/
+
+/*.layui-side-scroll {*/
+/*    background-color: #393d49!important;*/
+/*}*/
+
+.dark-theme {
+    background-color: #393d49!important;
+}
+/* #282b33
+ #23262e
+ #393d49
+ */

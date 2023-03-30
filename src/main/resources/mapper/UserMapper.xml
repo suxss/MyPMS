@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.mypms.mapper.UserMapper">
+    <select id="queryAllUser" resultType="com.example.mypms.model.User">
+        select * from pms.user
+    </select>
+
+    <select id="queryUserByEmail" resultType="com.example.mypms.model.User" parameterType="String">
+        select * from user where user.`email`= #{email} limit 1
+    </select>
+
+    <select id="getRolesByUid" resultType="com.example.mypms.model.Role" parameterType="String">
+        select r.* from pms.user u inner join pms.role r on u.rid = r.rid where u.uid = #{uid}
+    </select>
+
+    <insert id="insertPurchaser" parameterType="com.example.mypms.model.Purchaser">
+        insert into purchaser (uid, uname, email, pwd) values (#{uid}, #{uname}, #{email}, #{pwd})
+    </insert>
+
+    <insert id="insertVendor" parameterType="com.example.mypms.model.Vendor">
+        insert into vendor (uid, uname, email, pwd, phone, address) values (#{uid}, #{uname}, #{email}, #{pwd}, #{phone}, #{address})
+    </insert>
+
+</mapper>

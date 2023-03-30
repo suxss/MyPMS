@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+	<meta charset="UTF-8">
+	<meta name="renderer" content="webkit">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+	<title>供应商注册页</title>
+	<link rel="stylesheet" href="layui/css/layui.css">
+	<link rel="stylesheet" href="css/style.css">
+	<script src="js/jquery.min.js"></script>
+	<style>
+        /*定位*/
+        .map-location {
+            width: 28px;
+            height: 30px;
+            position: absolute;
+            top: 8px;
+            right: 0px;
+            z-index: 5;
+            font-size: 18px;
+            cursor: pointer;
+        }
+
+        .map-location-input {
+            padding-right: 30px;
+        }
+	</style>
+</head>
+<body>
+
+<div class="login-main">
+	<header class="layui-elip" style="width: 82%">供应商注册页</header>
+
+	<div class="layui-tab layui-tab-brief" lay-filter="docDemoTabBrief">
+
+		<div class="layui-tab-content" style="height: 100px;">
+			<form class="layui-form" lay-filter="v_reg" method="post" id="regform">
+				<div class="layui-input-inline" id="uname">
+					<!-- 用户名 -->
+					<div class="layui-inline" style="width: 85%">
+						<input type="text" id="user" name="username" required lay-verify="required|username"
+							   placeholder="请输入用户名" autocomplete="off" class="layui-input">
+					</div>
+					<!-- 对号 -->
+					<div class="layui-inline">
+						<i class="layui-icon" id="ri" style="color: green;font-weight: bolder;" hidden></i>
+					</div>
+					<!-- 错号 -->
+					<div class="layui-inline">
+						<i class="layui-icon" id="wr" style="color: red; font-weight: bolder;" hidden>ဆ</i>
+					</div>
+				</div>
+
+				<!-- 手机号 -->
+				<div class="layui-input-inline" id="uphone">
+					<div class="layui-inline" style="width: 85%">
+						<input type="text" id="phone" name="phone" required lay-verify="required|phone"
+							   placeholder="请输入手机号" autocomplete="off" class="layui-input">
+					</div>
+					<!-- 对号 -->
+					<div class="layui-inline">
+						<i class="layui-icon" id="ri" style="color: green;font-weight: bolder;" hidden></i>
+					</div>
+					<!-- 错号 -->
+					<div class="layui-inline">
+						<i class="layui-icon" id="wr" style="color: red; font-weight: bolder;" hidden>ဆ</i>
+					</div>
+				</div>
+
+				<div class="layui-input-inline" id="umail">
+					<!-- 邮箱 -->
+					<div class="layui-inline" style="width: 85%">
+						<input type="email" id="email" name="email" required lay-verify="required|email"
+							   placeholder="请输入邮箱地址" autocomplete="off" class="layui-input">
+					</div>
+					<!-- 对号 -->
+					<div class="layui-inline">
+						<i class="layui-icon" id="mailri" style="color: green;font-weight: bolder;" hidden></i>
+					</div>
+					<!-- 错号 -->
+					<div class="layui-inline">
+						<i class="layui-icon" id="mailwr" style="color: red; font-weight: bolder;" hidden>ဆ</i>
+					</div>
+				</div>
+
+				<div class="layui-input-inline" style="width: 85%">
+					<input id="location_input" name="address" placeholder="请选择公司地址"
+						   class="layui-input map-location-input"
+						   lay-verType="tips" lay-verify="required" readonly="readonly" required/>
+					<div id="locationBtn" class="layui-icon layui-icon-location map-location"></div>
+				</div>
+
+				<div class="layui-input-inline" style="width: 85%">
+					<div id="slider"></div>
+				</div>
+				<div class="layui-input-inline" style="width: 85%">
+					<div class="layui-btn" id="regBtn" style="width: 100%">注册</div>
+				</div>
+				<hr style="width: 85%"/>
+				<p style="width: 85%">
+					<a href="login.html" class="fl">已有账号？立即登录</a>
+					<a href="p_register.html" class="fr">采购员注册</a>
+				</p>
+			</form>
+
+		</div>
+	</div>
+
+
+	<!-- 采购员表单选项 -->
+
+
+</div>
+
+
+<script src="layui/layui.js"></script>
+<script type="text/javascript">
+    const reg_path = "v_register";
+
+    layui.config({
+            base: 'layui/myplugins/'
+        }
+    ).use(['form', 'jquery', 'layer', 'password', 'sliderVerify', 'addrHelper'], function () {
+        var form = layui.form;
+        var $ = layui.jquery;
+        var password = layui.password;
+        var layer = layui.layer;
+        const addrHelper = layui.addrHelper;
+
+        password.render({
+            event: 'example',
+            next: 'umail',
+            pwd: '请输入密码',
+            checkPwd: '请再次输入密码',
+            checkPwdName: 'repassword'
+        });
+
+        var sliderVerify = layui.sliderVerify;
+        var slider = sliderVerify.render({
+            elem: '#slider',
+            onOk: function () {//当验证通过回调
+                layer.msg("滑块验证通过");
+            }
+        });
+
+        $('#locationBtn').on('click', function () {
+            // 打开坐标拾取器
+            addrHelper.render({
+                key: "3GVBZ-IJVLO-6DAW7-STB46-CD7C5-H5BOE", //必传，腾讯地图api key 申请方法见：https://lbs.qq.com/webApi/javascriptGL/glGuide/glBasic
+                // el: '#map', //可选项，渲染容器，为空则以弹窗形式打开 默认为空
+                lat: 30.03033, //可选项，初始化纬度
+                lng: 120.5802, //可选项，初始化经度
+                zoom: 13, //可选项，地图缩放级别 默认值13
+                width: "80vw", //可选项，弹窗的宽度 默认80vw
+                height: "80vh", //可选项，弹窗的高度 默认80vh
+                toolbar: true, //可选项，显示工具栏 默认true
+                success: function (res) { //可选项，确认后回调
+                    //addressInfo 选中的地址, geometryPaths 选中的区域坐标
+                    console.log(res)
+                    if (res.addressInfo === null) {
+                        layer.msg("请选择地址后再提交", {icon: 2})
+                        return
+                    }
+                    // layer.alert(JSON.stringify(res));
+                    addrHelper.close();
+                    $("#location_input").val(res['addressInfo']['address'])
+                }
+            })
+        });
+
+        // 为密码添加正则验证
+        $('#pwd').blur(function () {
+            var reg = /^[\w]{6,16}$/;
+            if (!($('#pwd').val().match(reg))) {
+                //layer.msg('请输入合法密码');
+                $('#pwr').removeAttr('hidden');
+                $('#pri').attr('hidden', 'hidden');
+                layer.msg('请输入合法密码');
+            } else {
+                $('#pri').removeAttr('hidden');
+                $('#pwr').attr('hidden', 'hidden');
+            }
+        });
+
+        //验证两次密码是否一致
+        $('#rpwd').blur(function () {
+            if ($('#pwd').val() != $('#rpwd').val()) {
+                $('#rpwr').removeAttr('hidden');
+                $('#rpri').attr('hidden', 'hidden');
+                layer.msg('两次输入密码不一致!');
+            } else {
+                $('#rpri').removeAttr('hidden');
+                $('#rpwr').attr('hidden', 'hidden');
+            }
+            ;
+        });
+
+        form.verify({
+            username: function (value, item) { //value：表单的值、item：表单的DOM对象
+                if (!new RegExp("^[a-zA-Z0-9_\u4e00-\u9fa5\\s·]+$").test(value)) {
+                    return '用户名不能有特殊字符';
+                }
+                if (/(^\_)|(\__)|(\_+$)/.test(value)) {
+                    return '用户名首尾不能出现下划线\'_\'';
+                }
+                if (/^\d+\d+\d$/.test(value)) {
+                    return '用户名不能全为数字';
+                }
+                //如果不想自动弹出默认提示框，可以直接返回 true，这时你可以通过其他任意方式提示（v2.5.7 新增）
+                // if (value === 'xxx') {
+                //     alert('用户名不能为敏感词');
+                //     return true;
+                // }
+            }
+
+            , password: [
+                /^[\S]{6,16}$/
+                , '密码必须6到16位，且不能出现空格'
+            ]
+        });
+
+
+        $("#regBtn").on("click", function (data) {
+            console.log("注册");
+            flag1 = form.validate('#regform');
+            console.log(flag1);
+            if (flag1) {
+                flag2 = isvalid();
+                register_v(flag2);
+            }
+        })
+
+    });
+
+    function isvalid() {
+        if ($('#pwd').val() != $('#rpwd').val()) return -3;
+        if (!(slider.isOk())) return -4;
+        return 0;
+    }
+
+    function register_v(flag) {
+        switch (flag) {
+            case 0 :
+                const username = $("input[name='username']").val()
+					, email = $("input[name='email']").val()
+					, pwd = $("input[name='password']").val()
+					, phone = $("input[name='phone']").val()
+					, address = $("input[name='address']").val();
+                reg_v(username, email, pwd, phone, address)
+				.then(function(data) {
+                    if (data.code == 0) {
+                        layer.msg('注册成功');
+                        setTimeout(function () {
+                            window.location.href = "login.html";
+                        }, 1000);
+                    } else {
+                        layer.msg(data.msg);
+                    }
+                }, function(error) {
+                    layer.msg('注册失败');
+                    console.log(error)
+                })
+                break;
+            case -1 :
+                layer.msg('请输入合法密码');
+                break;
+            case -2 :
+                layer.msg('请输入合法邮箱地址');
+                break;
+            case -3 :
+                layer.msg('两次输入密码不一致!');
+                break;
+            case -4 :
+                layer.msg('请先通过滑块验证');
+                break;
+            case -5 :
+                layer.msg('请输入合法手机号');
+                break;
+        }
+        //防止页面跳转
+        return false;
+    }
+
+    function reg_v(username, email, pwd, phone, address) {
+        return new Promise((resolve, reject) => {
+            fetch(reg_path, {
+                method: "post",
+                body: "username=" + escape(username) + "&email=" + escape(email) + "&password=" + pwd + "&phone=" + escape(phone) + "&address=" + escape(address),
+                headers: {
+                    "Content-Type": "application/x-www-form-urlencoded; charset=UTF-8"
+                }
+            }).then(response => response.json())
+                .then(data => {
+                    resolve(data);
+                })
+        })
+    }
+
+    function escape(str)
+    {
+        var s = "";
+        if (str.length === 0) return "";
+        s = str.replace(/&/g, "&amp;");
+        s = s.replace(/</g, "&lt;");
+        s = s.replace(/>/g, "&gt;");
+        s = s.replace(/\"/g, "&quot;");
+        return s;
+    }
+</script>
+</body>
+</html>

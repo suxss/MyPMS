@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <title>查看报价-采购员端</title>
+    <link rel="stylesheet" href="../layui/css/layui.css">
+    <script src="../js/jquery.min.js"></script>
+</head>
+<body>
+<div class="layui-layout layui-layout-admin">
+    <div class="layui-header">
+        <div class="layui-logo layui-hide-xs layui-bg-black">
+            采购管理系统
+        </div>
+
+        <!-- 头部区域（可配合layui 已有的水平导航） -->
+        <ul class="layui-nav layui-layout-left">
+            <!-- 移动端显示 -->
+            <li class="layui-nav-item layui-show-xs-inline-block layui-hide-sm" lay-header-event="menuLeft">
+                <i class="layui-icon layui-icon-spread-left"></i>
+            </li>
+            <li class="layui-nav-item"> 查看报价</li>
+        </ul>
+        <ul class="layui-nav layui-layout-right">
+            <li class="layui-nav-item layui-hide layui-show-md-inline-block">
+                <a href="javascript:;">
+                    <img src="../pic/avataaars.png" class="layui-nav-img">
+                    tester
+                </a>
+                <dl class="layui-nav-child">
+                    <dd><a href="">资料</a></dd>
+                    <dd><a href="">设置</a></dd>
+                    <dd><a href="">注销</a></dd>
+                </dl>
+            </li>
+            <li class="layui-nav-item" lay-header-event="menuRight" lay-unselect>
+                <a href="javascript:;">
+                    <i class="layui-icon layui-icon-more-vertical"></i>
+                </a>
+            </li>
+        </ul>
+    </div>
+
+    <div class="layui-side layui-bg-black">
+        <div class="layui-side-scroll">
+            <!-- 左侧导航区域（可配合layui已有的垂直导航） -->
+            <ul class="layui-nav layui-nav-tree" lay-filter="test">
+                <li class="layui-nav-item layui-nav-itemed">
+
+                    <a class="" href="javascript:;">
+                        <i class="layui-icon layui-icon-cart"></i>
+                        <span>采购需求管理</span>
+                    </a>
+                    <dl class="layui-nav-child">
+                        <dd class="menu-dd">
+                            <a href="demands.html">
+                                <i class="layui-icon layui-icon-form"></i>
+                                查看采购需求
+                            </a>
+                        </dd>
+                        <dd>
+                            <a href="demands_add.html">
+                                <i class="layui-icon layui-icon-addition"></i>
+                                添加采购需求
+                            </a>
+                        </dd>
+                    </dl>
+                </li>
+                <li class="layui-nav-item layui-nav-itemed">
+                    <a class="" href="javascript:;">
+                        <i class="layui-icon layui-icon-util"></i>
+                        <span>采购流程管理</span>
+                    </a>
+                    <dl class="layui-nav-child">
+                        <dd>
+                            <a href="purchases.html">
+                                <i class="layui-icon layui-icon-date"></i>
+                                查看采购流程
+                            </a>
+                        </dd>
+                    </dl>
+                </li>
+            </ul>
+        </div>
+    </div>
+
+    <div class="layui-body">
+        <!-- 内容主体区域 -->
+        <div style="padding: 15px;">
+            <div class="layui-panel">
+                <table id="demo" lay-filter="demo"></table>
+            </div>
+        </div>
+    </div>
+
+    <div class="layui-footer">
+        <!-- 底部固定区域 -->
+        <!-- 底部固定区域 -->
+    </div>
+</div>
+<script src="../layui/layui.js"></script>
+<script type="text/html" id="toolbarDemo">
+        <legend>查看报价</legend>
+</script>
+<script type="text/html" id="barDemo">
+    <a class="layui-btn layui-btn-xs layui-btn-xs" lay-event="detail">查看供应商信息</a>
+    <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="agree">同意报价</a>
+</script>
+<script>
+    const searchParams = new URLSearchParams(window.location.search)
+        , id = searchParams.get('id')
+        , query_quote_path = 'query/quote'
+        , agree_path = "agree/quote";
+
+
+    layui.use(['element', 'layer', 'util', 'table'], function () {
+        var element = layui.element
+            , layer = layui.layer
+            , util = layui.util
+            , $ = layui.$;
+
+        //头部事件
+        util.event('lay-header-event', {
+            //左侧菜单事件
+            menuLeft: function (othis) {
+                layer.msg('展开左侧菜单的操作', {icon: 0});
+            }
+            , menuRight: function () {
+                layer.open({
+                    type: 1
+                    , content: '<div style="padding: 15px;">处理右侧面板的操作</div>'
+                    , area: ['260px', '100%']
+                    , offset: 'rt' //右上角
+                    , anim: 5
+                    , shadeClose: true
+                });
+            }
+        });
+
+        var table = layui.table;
+
+        //第一个实例
+        table.render({
+            elem: '#demo'
+            , even: false
+            , title: '采购需求表'
+            , height: 600
+            , toolbar: true
+            , escape: true
+            , limit: 20
+            , url: '../testdata/demand.json?id=' + id //数据接口 //query_quote_path + '?id=' + id
+            , page: true //开启分页
+            , request: {
+                pageName: 'curr' //页码的参数名称，默认：page
+                , limitName: 'nums' //每页数据量的参数名，默认：limit
+            } // ?curr=1&nums=30
+            , parseData: function (res) { //res 即为原始返回的数据
+                for (var i = 0; i < res.data.length; i++) {
+                    res.data[i].expire_time = new Date(res.data[i].expire_time).toLocaleString();
+                    res.data[i]['total_price'] = res.data[i]['unit_price'] * res.data[i]['amount'];
+                }
+                return {
+                    "code": res.code, //解析接口状态
+                    "msg": res.message, //解析提示文本
+                    "count": res.total, //解析数据长度
+                    "data": res.data //解析数据列表
+                };
+            }
+            , cols: [[ //表头
+                {field: 'id', title: '编号', width: 100, sort: true, fixed: 'left'}
+                , {field: 'product_name', title: '产品名', width: 120}
+                , {field: 'amount', title: '数量', width: 120, sort: true}
+                , {field: 'unit_price', title: '单价', width: 120, sort: true}
+                , {field: 'total_price', title: '总价', width: 120, sort: true}
+                , {field: 'v_name', title: '供应商', width: 180, sort: true}
+                , {field: 'remark', title: '备注'}
+                , {title: '操作', width: 220, fixed: 'right', toolbar: '#barDemo'}
+            ]]
+            , defaultToolbar: ['filter', 'print', 'exports',
+            //     {
+            //     title: '提示' //标题
+            //     , layEvent: 'LAYTABLE_TIPS' //事件名，用于 toolbar 事件中使用
+            //     , icon: 'layui-icon-tips' //图标类名
+            // }
+            ]
+        });
+
+        table.on('tool(demo)', function (obj) {
+            var data = obj.data;
+            if (obj.event === 'detail') {
+                layer.open({
+                    type: 2,
+                    area: ['750px', '700px'],
+                    fixed: false, //不固定
+                    maxmin: true,
+                    content: 'vinfo.html?vid=' + data.v_id
+                });
+            } else if (obj.event === 'agree') {
+                layer.confirm('真的同意该报价么', function (index) {
+                    if (agree(data.id) === 0) {
+                        layer.msg('操作成功');
+                        setTimeout(function () {
+                            window.location = 'demands.html';
+                        }, 1000);
+                    }
+                    // obj.del();
+                    layer.close(index);
+                });
+            }
+        });
+
+        function agree(qid) {
+            return new Promise((resolve, reject) => {
+                fetch(agree_path, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        qid: qid
+                    })
+                }).then(response => response.json())
+                .then(function (data) {
+                    if (data.code === 0) {
+                        resolve(0);
+                    } else {
+                        resolve(-1);
+                    }
+                }).catch(function (e) {
+                    reject(e);
+                });
+            })
+
+        }
+
+    });
+</script>
+</body>
+</html>

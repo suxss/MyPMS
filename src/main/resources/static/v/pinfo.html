@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>采购员信息</title>
+	<link rel="stylesheet" href="../layui/css/layui.css">
+	<script src="../js/jquery.min.js"></script>
+	<script src="../layui/layui.js"></script>
+	<style>
+		.layui-rate {
+            padding: 0px 5px 0px 0px;
+		}
+	</style>
+</head>
+<body>
+<div class="layui-bg-gray" style="padding: 30px;">
+	<div class="layui-row layui-col-space15">
+		<div class="layui-col-md6">
+			<div class="layui-card">
+				<div class="layui-card-header">名称</div>
+				<div class="layui-card-body">
+					<span id="name">*********</span>
+				</div>
+			</div>
+		</div>
+		<div class="layui-col-md6">
+			<div class="layui-card">
+				<div class="layui-card-header">邮箱</div>
+				<div class="layui-card-body">
+					<span id="email">*********</span>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="layui-row layui-col-space15">
+		<div class="layui-col-md6">
+			<div class="layui-card">
+				<div class="layui-card-header">评分</div>
+				<div class="layui-card-body">
+					<div id="rate"></div>
+				</div>
+			</div>
+		</div>
+		<div class="layui-col-md6">
+			<div class="layui-card">
+				<div class="layui-card-header">评分人次</div>
+				<div class="layui-card-body">
+					<span id="rate_num">0</span>次
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+</body>
+<script>
+    const searchParams = new URLSearchParams(window.location.search)
+		, pid = searchParams.get('pid')
+		, query_path = 'query/p_info';
+    let info = query_p_info(pid);
+
+    layui.use(['rate'], function () {
+        var rate = layui.rate
+            , $ = layui.$;
+
+        layer.msg(pid);
+
+        $('#name').text(info.name);
+        $('#email').text(info.email);
+        $('#rate_num').text(info.rate_num);
+
+        rate.render({
+            elem: '#rate'
+            ,value: info.rate.toString()
+            ,half: true
+            ,readonly: true
+        })
+    });
+
+    function query_p_info(pid) {
+        return new Promise((resolve, reject) => {
+            fetch(query_path, {
+                method: 'post', body: 'pid=' + pid, headers: {
+                    "Content-Type": "application/x-www-form-urlencoded; charset=UTF-8"
+                }
+            }).then(response => response.json())
+			.then(data => {
+				resolve(data.data)
+			})
+			.catch(error => {
+				console.log(error);
+				reject(error);
+			})
+        })
+    }
+</script>
+</html>

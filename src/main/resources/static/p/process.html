@@ -1,0 +1,506 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <title>查看采购流程-采购员端</title>
+    <link rel="stylesheet" href="../layui/css/layui.css">
+    <link rel="stylesheet" href="../css/step.css">
+    <script src="../js/jquery.min.js"></script>
+</head>
+<body>
+<div class="layui-layout layui-layout-admin">
+    <div class="layui-header">
+        <div class="layui-logo layui-hide-xs layui-bg-black">
+            采购管理系统
+        </div>
+
+        <!-- 头部区域（可配合layui 已有的水平导航） -->
+        <ul class="layui-nav layui-layout-left">
+            <!-- 移动端显示 -->
+            <li class="layui-nav-item layui-show-xs-inline-block layui-hide-sm" lay-header-event="menuLeft">
+                <i class="layui-icon layui-icon-spread-left"></i>
+            </li>
+            <li class="layui-nav-item"> 进行中的采购</li>
+        </ul>
+        <ul class="layui-nav layui-layout-right">
+            <li class="layui-nav-item layui-hide layui-show-md-inline-block">
+                <a href="javascript:;">
+                    <img src="../pic/avataaars.png" class="layui-nav-img">
+                    tester
+                </a>
+                <dl class="layui-nav-child">
+                    <dd><a href="">资料</a></dd>
+                    <dd><a href="">设置</a></dd>
+                    <dd><a href="">注销</a></dd>
+                </dl>
+            </li>
+            <li class="layui-nav-item" lay-header-event="menuRight" lay-unselect>
+                <a href="javascript:;">
+                    <i class="layui-icon layui-icon-more-vertical"></i>
+                </a>
+            </li>
+        </ul>
+    </div>
+
+    <div class="layui-side layui-bg-black">
+        <div class="layui-side-scroll">
+            <!-- 左侧导航区域（可配合layui已有的垂直导航） -->
+            <ul class="layui-nav layui-nav-tree" lay-filter="test">
+                <li class="layui-nav-item layui-nav-itemed">
+
+                    <a class="" href="javascript:;">
+                        <i class="layui-icon layui-icon-cart"></i>
+                        <span>采购需求管理</span>
+                    </a>
+                    <dl class="layui-nav-child">
+                        <dd class="menu-dd">
+                            <a href="demands.html">
+                                <i class="layui-icon layui-icon-form"></i>
+                                查看采购需求
+                            </a>
+                        </dd>
+                        <dd>
+                            <a href="demands_add.html">
+                                <i class="layui-icon layui-icon-addition"></i>
+                                添加采购需求
+                            </a>
+                        </dd>
+                    </dl>
+                </li>
+                <li class="layui-nav-item layui-nav-itemed">
+                    <a class="" href="javascript:;">
+                        <i class="layui-icon layui-icon-util"></i>
+                        <span>采购流程管理</span>
+                    </a>
+                    <dl class="layui-nav-child">
+                        <dd>
+                            <a href="purchases.html">
+                                <i class="layui-icon layui-icon-date"></i>
+                                查看采购流程
+                            </a>
+                        </dd>
+                    </dl>
+                </li>
+            </ul>
+        </div>
+    </div>
+
+    <div class="layui-body layui-bg-gray">
+        <!-- 内容主体区域 -->
+        <div style="padding: 15px;">
+            <div class="layui-panel">
+                <fieldset class="layui-elem-field layui-field-title">
+                    <legend>采购编号: <span id="id"></span> </legend>
+                </fieldset>
+
+
+                <div class="layui-fluid">
+                    <div class="layui-card">
+                        <div class="layui-card-body" style="padding-top: 40px;">
+                            <div class="layui-carousel" id="stepForm" lay-filter="stepForm" style="margin: 0 auto;">
+                                <!--                            class="layui-carousel"-->
+                                <div carousel-item>
+<!--                                    采购员上传合同-->
+                                    <div>
+                                        <form class="layui-form" style="margin: 0 auto;max-width: 460px;padding-top: 40px;">
+                                            <center>
+                                                <div class="layui-form-item">
+                                                    <div class="layui-upload-drag" id="upload1" style="width: 80%; height: 200%">
+                                                        <i class="layui-icon"></i>
+                                                        <p>点击上传，或将文件拖拽到此处</p>
+                                                        <div class="layui-hide" id="uploadDemoView">
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="layui-form-item">
+                                                    <div class="layui-btn" id="submitBtn1">
+                                                        确认上传
+                                                    </div>
+                                                    <div class="layui-btn layui-btn-primary next">
+                                                        下一步
+                                                    </div>
+                                                </div>
+                                            </center>
+                                        </form>
+                                    </div>
+<!--                                    供应商下载合同，签字再上传，或者取消采购-->
+                                    <div>
+                                        <form class="layui-form" style="margin: 0 auto;max-width: 460px;padding-top: 40px;">
+                                            <center>
+<!--                                                <div class="layui-form-item">-->
+<!--                                                    <div class="layui-btn">-->
+<!--                                                        <a style="color: white">下载合同</a>-->
+<!--                                                    </div>-->
+<!--                                                </div>-->
+<!--                                                <div class="layui-form-item">-->
+<!--                                                    <div class="layui-upload-drag" id="upload2" style="width: 80%; height: 200%">-->
+<!--                                                        <i class="layui-icon"></i>-->
+<!--                                                        <p>点击上传，或将文件拖拽到此处</p>-->
+<!--                                                        <div class="layui-hide" id="uploadDemoView2">-->
+<!--                                                        </div>-->
+<!--                                                    </div>-->
+<!--                                                </div>-->
+<!--                                                <div class="layui-form-item">-->
+<!--                                                    <div class="layui-btn" id="submitBtn2">-->
+<!--                                                        确认上传-->
+<!--                                                    </div>-->
+<!--                                                </div>-->
+<!--                                                <div class="layui-form-item">-->
+<!--                                                    <div class="layui-btn layui-btn-primary next">-->
+<!--                                                        下一步-->
+<!--                                                    </div>-->
+<!--                                                </div>-->
+                                                <span>请等待供应商上传合同</span>
+                                            </center>
+                                        </form>
+                                    </div>
+<!--                                    采购员下载合同，确认合同无误，或者取消采购-->
+                                    <div>
+                                        <form class="layui-form" style="margin: 0 auto;max-width: 460px;padding-top: 40px;">
+                                            <center>
+                                                <div class="layui-form-item">
+                                                    <div class="layui-btn">
+                                                        <a id="downloadBtn" style="color: white">下载合同</a>
+                                                    </div>
+                                                </div>
+                                                <div class="layui-form-item">
+                                                    <div class="layui-btn" id="agreeBtn">
+                                                        同意
+                                                    </div>
+                                                    <div class="layui-btn" id="cancelBtn">
+                                                        取消采购
+                                                    </div>
+                                                </div>
+                                                <div class="layui-form-item">
+                                                    <div class="layui-btn layui-btn-primary next">
+                                                        下一步
+                                                    </div>
+                                                </div>
+                                            </center>
+                                        </form>
+                                    </div>
+<!--                                    供应商确认发货-->
+                                    <div>
+                                        <form class="layui-form" style="margin: 0 auto;max-width: 460px;padding-top: 40px;">
+                                            <center>
+<!--                                                <div class="layui-form-item">-->
+<!--                                                    <div class="layui-btn">-->
+<!--                                                        确认发货-->
+<!--                                                    </div>-->
+<!--                                                    <div class="layui-btn layui-btn-primary next">-->
+<!--                                                        下一步-->
+<!--                                                    </div>-->
+<!--                                                </div>-->
+                                                <span>请等待供应商确认发货</span>
+                                            </center>
+                                        </form>
+                                    </div>
+<!--                                    采购员确认收货-->
+                                    <div>
+                                        <form class="layui-form" style="margin: 0 auto;max-width: 460px;padding-top: 40px;">
+                                            <center>
+                                                <div class="layui-form-item">
+                                                    <div class="layui-btn" id="confirmDeliveryBtn">
+                                                        确认收货
+                                                    </div>
+                                                    <div class="layui-btn layui-btn-primary next">
+                                                        下一步
+                                                    </div>
+                                                </div>
+                                            </center>
+                                        </form>
+                                    </div>
+<!--                                    互相评价-->
+                                    <div>
+                                        <form class="layui-form" style="margin: 0 auto;max-width: 460px;padding-top: 40px;">
+                                            <center>
+                                                <div class="layui-form-item">
+                                                    <div id="rate"></div>
+                                                </div>
+                                                <div class="layui-form-item">
+                                                    <div class="layui-btn" id="submitBtn3">
+                                                        提交
+                                                    </div>
+                                                </div>
+                                            </center>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                            <hr>
+                            <!--                        <div style="color: #666;margin-top: 30px;margin-bottom: 40px;padding-left: 30px;">-->
+                            <!--                            <h3>说明</h3><br>-->
+                            <!--                            <h4>入款到保险箱</h4>-->
+                            <!--                            <p>如果需要，这里可以放一些关于产品的常见问题说明。</p>-->
+                            <!--                            <br><h4>入款到现金</h4>-->
+                            <!--                            <p>如果需要，这里可以放一些关于产品的常见问题说明。</p>-->
+                            <!--                        </div>-->
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <div class="layui-footer">
+        <!-- 底部固定区域 -->
+        <!-- 底部固定区域 -->
+    </div>
+</div>
+<script src="../layui/layui.js"></script>
+<script type="text/html" id="barDemo">
+    <a class="layui-btn layui-btn-xs layui-btn-xs" lay-event="detail">查看流程</a>
+</script>
+
+<script>
+    const searchParams = new URLSearchParams(window.location.search)
+        , id = searchParams.get('id')
+        , query_status_path = 'query/status'
+        , upload_path = 'upload/contract'
+        , download_path = 'download/contract'
+        , agree_path = 'agree/contract'
+        , cancel_path = 'delete/processing'
+        , confirm_path = 'confirm/delivery'
+        , rate_path = 'add/rate';
+    const debugFlag = false
+        , status = getStatus();
+
+    if (!debugFlag) {
+        $(".next").hide();
+    }
+
+    function getStatus() {
+        return new Promise((resolve, reject) => {
+            fetch(query_status_path + "?id=" + id)
+            .then(response => response.json())
+            .then(function (data) {
+                if (data.code === 0) {
+                    resolve(data.data.status);
+                } else {
+                    reject(data.msg);
+                }
+            })
+            .catch(err => {
+                reject(err)
+            });
+        })
+    }
+
+    $("#id").text(id);
+    $("#downloadBtn").attr("href", download_path + "?id=" + id);  //设置下载合同的链接
+
+    layui.config({
+                base: '../layui/myplugins/'
+            }
+    ).use(['element', 'layer', 'util', 'laydate', 'step', 'form', 'upload', 'rate'], function () {
+        var element = layui.element
+                , layer = layui.layer
+                , util = layui.util
+                , laydate = layui.laydate
+                , upload = layui.upload
+                , step = layui.step
+                , form = layui.form
+                , rate = layui.rate
+                , $ = layui.$;
+
+        if (status >= 1 && status <= 6) {
+            for (let i = 1; i < status; i++) {
+                next();
+            }
+        }
+
+        rate.render({
+            elem: '#rate'
+            ,value: '0'
+            ,half: true
+            ,text: true
+        })
+
+        upload.render({
+            elem: '#upload1'
+            ,accept: 'file'
+            ,exts: 'pdf|doc|docx'
+            ,auto: false
+            ,multiple: false
+            ,data: {
+                "id": id
+            }
+            ,url: 'https://httpbin.org/post' //此处用的是第三方的 http 请求演示，实际使用时改成您自己的上传接口即可。
+            // upload_path
+            ,bindAction: '#submitBtn1'
+            ,size: 1024 * 10
+            ,done: function(res){
+                res = JSON.parse(res);
+                if (res.code === 0) {
+                    layer.msg('上传成功');
+                    next();
+                } else {
+                    layer.msg('上传失败');
+                }
+            }
+        });
+
+        step.render({
+            elem: '#stepForm',
+            filter: 'stepForm',
+            width: '100%', //设置容器宽度
+            stepWidth: '750px',
+            height: '500px',
+            // index: 3,
+            stepItems: [{
+                title: '步骤1', desc: '采购员<br>上传采购合同'
+            }, {
+                title: '步骤2', desc: '供应商<br>签署合同并上传'
+            }, {
+                title: '步骤3', desc: '采购员<br>进行确认'
+            }, {
+                title: '步骤4', desc: '供应商<br>确认发货'
+            }, {
+                title: '步骤5', desc: '采购员<br>确认收货'
+            }, {
+                title: '步骤6', desc: '双方<br>互相评价'
+            }]
+        });
+
+        form.on('submit(formStep)', function (data) {
+            step.next('#stepForm');
+            return false;
+        });
+
+        form.on('submit(formStep2)', function (data) {
+            step.next('#stepForm');
+            return false;
+        });
+
+        $("#agreeBtn").on('click', function () {
+            fetch(agree_path, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    id: id
+                })
+            }).then(res => res.json())
+            .then(function (data) {
+                if (data.code === 0) {
+                    layer.msg('合同已签署', {icon: 1});
+                    next();
+                } else {
+                    layer.msg(data.msg, {icon: 2});
+                }
+            }).catch(function (err) {
+                layer.msg('网络错误', {icon: 2});
+            });
+        })
+
+        $("#cancelBtn").on('click', function () {
+            fetch(cancel_path, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    id: id
+                })
+            }).then(res => res.json())
+            .then(function (data) {
+                if (data.code === 0) {
+                    layer.msg('已取消', {icon: 1});
+                    location.href = 'purchases.html';
+                } else {
+                    layer.msg(data.msg, {icon: 2});
+                }
+            }).catch(function (err) {
+                layer.msg('网络错误', {icon: 2});
+            });
+        })
+
+        $("#confirmDeliveryBtn").on('click', function () {
+            fetch(confirm_path, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    id: id
+                })
+            }).then(res => res.json())
+            .then(function (data) {
+                if (data.code === 0) {
+                    layer.msg('已确认', {icon: 1});
+                    next();
+                } else {
+                    layer.msg(data.msg, {icon: 2});
+                }
+            }).catch(function (err) {
+                layer.msg('网络错误', {icon: 2});
+            });
+        })
+
+        $("#rateBtn").on('click', function () {
+            var rate = $("#rate").val();
+            fetch(rate_path, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    id: id,
+                    rate: rate
+                })
+            }).then(res => res.json())
+            .then(function (data) {
+                if (data.code === 0) {
+                    layer.msg('已评价', {icon: 1});
+                    location.href = 'purchases.html';
+                } else {
+                    layer.msg(data.msg, {icon: 2});
+                }
+            }).catch(function (err) {
+                layer.msg('网络错误', {icon: 2});
+            });
+        })
+
+        $('.pre').click(function () {
+            step.pre('#stepForm');
+        });
+
+        $('.next').click(function () {
+            step.next('#stepForm');
+        });
+
+        function next() {
+            step.next('#stepForm');
+        }
+
+        function pre() {
+            step.pre('#stepForm');
+        }
+
+
+
+        //头部事件
+        util.event('lay-header-event', {
+            //左侧菜单事件
+            menuLeft: function (othis) {
+                layer.msg('展开左侧菜单的操作', {icon: 0});
+            }
+            , menuRight: function () {
+                layer.open({
+                    type: 1
+                    , content: '<div style="padding: 15px;">处理右侧面板的操作</div>'
+                    , area: ['260px', '100%']
+                    , offset: 'rt' //右上角
+                    , anim: 5
+                    , shadeClose: true
+                });
+            }
+        });
+    });
+</script>
+
+</body>
+</html>
