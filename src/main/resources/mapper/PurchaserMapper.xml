@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.mypms.mapper.PurchaserMapper">
+    <insert id="addDemand" parameterType="com.example.mypms.model.ProcurementDemand">
+        insert into pd(p_uid, product_name, amount, expire_time, start_time, remark)
+        values (#{p_uid}, #{product_name}, #{amount}, #{expire_time}, #{start_time}, #{remark})
+    </insert>
+
+    <select id="getDemandsByUid" resultType="com.example.mypms.model.ProcurementDemand">
+        select pdid,
+               p_uid,
+               product_name,
+               amount,
+               expire_time,
+               start_time,
+               remark,
+               uid as p_uid,
+               uname
+        from pd
+                 inner join purchaser p on pd.p_uid = p.uid
+        where expire_time > now()
+          and p_uid = #{p_uid}
+        limit #{size} offset #{offset}
+    </select>
+
+    <select id="getDemandsCountByUid" resultType="int" parameterType="String">
+        select count(*)
+        from pd
+        where p_uid = #{p_uid}
+          and expire_time > now()
+    </select>
+
+    <delete id="deleteDemand">
+        delete
+        from pd
+        where pdid = #{pdid}
+          and expire_time > now()
+          and p_uid = #{p_uid}
+    </delete>
+
+    <select id="getQuotesByPdid" resultType="com.example.mypms.model.Quote">
+        select qid, p_id, v_uid, uname, amount, total_price, remark
+        from quote
+                 inner join vendor v on quote.v_uid = v.uid
+        where p_id = #{pdid}
+        limit #{size} offset #{offset}
+    </select>
+
+    <select id="isDemandBelongToPurchaser" resultType="int">
+        select count(*)
+        from pd
+        where pdid = #{pdid}
+          and p_uid = #{p_uid}
+    </select>
+
+    <select id="getQuotesCountByPdid" resultType="int">
+        select count(*)
+        from quote
+        where p_id = #{pdid}
+    </select>
+
+    <delete id="deleteOtherQuotesByPdidAndQid">
+        delete
+        from quote
+        where p_id = #{pdid}
+          and qid != #{qid}
+    </delete>
+
+    <update id="invalidDemandByPdidAndUid">
+        update pd
+        set expire_time = now()
+        where pdid = #{pdid}
+          and p_uid = #{p_uid}
+    </update>
+
+    <select id="getProcurementsByUid" resultType="com.example.mypms.model.Procurement">
+        select pid,
+               qid,
+               status,
+               product_name,
+               amount,
+               total_price,
+               v_uid,
+               p_uid,
+               start_time,
+               cname,
+               cpath,
+               cexpire_time
+        from processing
+        where p_uid = #{p_uid}
+        limit #{size} offset #{offset}
+    </select>
+
+    <select id="getProcurementsCountByUid" resultType="int">
+        select count(*)
+        from processing
+        where p_uid = #{p_uid}
+    </select>
+
+    <select id="getVendorByUid" resultType="com.example.mypms.model.Vendor">
+        select uid, uname, email, phone, address, rate, rate_num
+        from vendor
+        where uid = #{uid}
+        limit 1
+    </select>
+
+    <insert id="addProcurement" parameterType="com.example.mypms.model.Procurement">
+        insert into procurement (qid, start_time, cname, cpath, cexpire_time)
+        values (#{qid}, #{start_time}, #{cname}, #{cpath}, #{cexpire_time})
+    </insert>
+
+    <select id="getPdidByQidAndUid" resultType="int">
+        select pdid
+        from pd
+                 inner join quote on pd.pdid = quote.p_id
+        where qid = #{qid}
+          and p_uid = #{uid}
+    </select>
+
+    <delete id="deleteAllQuotesByPdid">
+        delete
+        from quote
+        where p_id = #{pdid}
+    </delete>
+</mapper>

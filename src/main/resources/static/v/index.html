@@ -7,6 +7,7 @@
     <link rel="stylesheet" href="../layui/css/layui.css">
     <script src="../js/jquery.min.js"></script>
     <script src="../js/echarts.min.js"></script>
+    <script src="../js/main.js"></script>
     <style>
         .layui-rate {
             padding: 0px 5px 0px 0px;
@@ -32,13 +33,13 @@
             <li class="layui-nav-item layui-hide layui-show-md-inline-block">
                 <a href="javascript:;">
                     <img src="../pic/avataaars.png" class="layui-nav-img">
-                    tester
+					<span id="username_label">xxx</span>
                 </a>
-                <dl class="layui-nav-child">
-                    <dd><a href="">资料</a></dd>
-                    <dd><a href="">设置</a></dd>
-                    <dd><a href="">注销</a></dd>
-                </dl>
+				<dl class="layui-nav-child">
+					<!--                    <dd><a href="">资料</a></dd>-->
+					<!--                    <dd><a href="">设置</a></dd>-->
+					<dd><a href="javascript: main();">注销</a></dd>
+				</dl>
             </li>
             <li class="layui-nav-item" lay-header-event="menuRight" lay-unselect>
                 <a href="javascript:;">

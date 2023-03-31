@@ -16,11 +16,11 @@
     <form class="layui-form">
         <center>
             <div class="layui-form-item">
-                <!-- <div class="layui-input-block"> -->
-                <input type="radio" name="userType" value="0" title="采购员" checked>
-                <input type="radio" name="userType" value="1" title="供应商">
-                <!-- </div> -->
-            </div>
+				<!-- <div class="layui-input-block"> -->
+				<!--                <input type="radio" name="userType" value="0" title="采购员" checked>-->
+				<!--                <input type="radio" name="userType" value="1" title="供应商">-->
+				<!-- </div> -->
+			</div>
         </center>
 <!--        </div>-->
         <div class="layui-input-inline">
@@ -80,15 +80,11 @@
                 , login_path;
             if (verfiy) {
                 login_path = "login";
-                fetch(login_path, {
+                fetch(login_path + "?email=" + email + "&password=" + password, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'
                     },
-                    body: JSON.stringify({
-                        email: email,
-                        password: password
-                    })
                 }).then(response => response.json())
                         .then(function (data) {
                             if (data.code === 0) {

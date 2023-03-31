@@ -56,31 +56,40 @@
     const searchParams = new URLSearchParams(window.location.search)
 		, pid = searchParams.get('pid')
 		, query_path = 'query/p_info';
-    let info = query_p_info(pid);
+
 
     layui.use(['rate'], function () {
         var rate = layui.rate
             , $ = layui.$;
 
-        layer.msg(pid);
+        // layer.msg(pid);
 
-        $('#name').text(info.name);
-        $('#email').text(info.email);
-        $('#rate_num').text(info.rate_num);
+        query_p_info(pid).then(function (info) {
+            $('#name').text(info.uname);
+            $('#email').text(info.email);
+            $('#rate_num').text(info.rate_num);
 
-        rate.render({
-            elem: '#rate'
-            ,value: info.rate.toString()
-            ,half: true
-            ,readonly: true
+            rate.render({
+                elem: '#rate'
+                , value: info.rate.toString()
+                , half: true
+                , readonly: true
+            })
+        }, function (error) {
+            layer.msg("查询失败", {icon: 2});
+            console.log(error);
         })
     });
 
     function query_p_info(pid) {
         return new Promise((resolve, reject) => {
             fetch(query_path, {
-                method: 'post', body: 'pid=' + pid, headers: {
-                    "Content-Type": "application/x-www-form-urlencoded; charset=UTF-8"
+                method: 'post',
+                body: JSON.stringify({
+                    pid: pid
+                }),
+                headers: {
+                    "Content-Type": "application/json"
                 }
             }).then(response => response.json())
 			.then(data => {

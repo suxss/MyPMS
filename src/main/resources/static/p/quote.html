@@ -6,6 +6,7 @@
     <title>查看报价-采购员端</title>
     <link rel="stylesheet" href="../layui/css/layui.css">
     <script src="../js/jquery.min.js"></script>
+    <script src="../js/main.js"></script>
 </head>
 <body>
 <div class="layui-layout layui-layout-admin">
@@ -26,12 +27,12 @@
             <li class="layui-nav-item layui-hide layui-show-md-inline-block">
                 <a href="javascript:;">
                     <img src="../pic/avataaars.png" class="layui-nav-img">
-                    tester
+                    <span id="username_label">xxx</span>
                 </a>
                 <dl class="layui-nav-child">
-                    <dd><a href="">资料</a></dd>
-                    <dd><a href="">设置</a></dd>
-                    <dd><a href="">注销</a></dd>
+                    <!--                    <dd><a href="">资料</a></dd>-->
+                    <!--                    <dd><a href="">设置</a></dd>-->
+                    <dd><a href="javascript: main();">注销</a></dd>
                 </dl>
             </li>
             <li class="layui-nav-item" lay-header-event="menuRight" lay-unselect>
@@ -109,9 +110,10 @@
 </script>
 <script>
     const searchParams = new URLSearchParams(window.location.search)
-        , id = searchParams.get('id')
-        , query_quote_path = 'query/quote'
-        , agree_path = "agree/quote";
+            , id = searchParams.get('id')
+            , query_quote_path = 'query/quote'
+            , vinfo_path = "vinfo.html"
+            , agree_path = "agree/quote";
 
 
     layui.use(['element', 'layer', 'util', 'table'], function () {
@@ -149,7 +151,7 @@
             , toolbar: true
             , escape: true
             , limit: 20
-            , url: '../testdata/demand.json?id=' + id //数据接口 //query_quote_path + '?id=' + id
+            , url: query_quote_path + '?id=' + id //数据接口  query_quote_path + '?id=' + id  // '../testdata/demand.json?id='
             , page: true //开启分页
             , request: {
                 pageName: 'curr' //页码的参数名称，默认：page
@@ -158,22 +160,23 @@
             , parseData: function (res) { //res 即为原始返回的数据
                 for (var i = 0; i < res.data.length; i++) {
                     res.data[i].expire_time = new Date(res.data[i].expire_time).toLocaleString();
-                    res.data[i]['total_price'] = res.data[i]['unit_price'] * res.data[i]['amount'];
+                    res.data[i].id = res.data[i].qid;
+                    res.data[i]['unit_price'] = res.data[i]['total_price'] / res.data[i]['amount'];
                 }
                 return {
                     "code": res.code, //解析接口状态
-                    "msg": res.message, //解析提示文本
+                    "msg": res.msg, //解析提示文本
                     "count": res.total, //解析数据长度
                     "data": res.data //解析数据列表
                 };
             }
             , cols: [[ //表头
                 {field: 'id', title: '编号', width: 100, sort: true, fixed: 'left'}
-                , {field: 'product_name', title: '产品名', width: 120}
+                // , {field: 'product_name', title: '产品名', width: 120}
                 , {field: 'amount', title: '数量', width: 120, sort: true}
                 , {field: 'unit_price', title: '单价', width: 120, sort: true}
                 , {field: 'total_price', title: '总价', width: 120, sort: true}
-                , {field: 'v_name', title: '供应商', width: 180, sort: true}
+                , {field: 'uname', title: '供应商', width: 180, sort: true}
                 , {field: 'remark', title: '备注'}
                 , {title: '操作', width: 220, fixed: 'right', toolbar: '#barDemo'}
             ]]
@@ -194,16 +197,20 @@
                     area: ['750px', '700px'],
                     fixed: false, //不固定
                     maxmin: true,
-                    content: 'vinfo.html?vid=' + data.v_id
+                    content: vinfo_path + '?v_uid=' + data.v_uid
                 });
             } else if (obj.event === 'agree') {
                 layer.confirm('真的同意该报价么', function (index) {
-                    if (agree(data.id) === 0) {
-                        layer.msg('操作成功');
-                        setTimeout(function () {
-                            window.location = 'demands.html';
-                        }, 1000);
-                    }
+                    agree(data.id).then(function (data) {
+                        if (data === 0) {
+                            layer.msg('操作成功');
+                            setTimeout(function () {
+                                window.location = 'demands.html';
+                            }, 1000);
+                        }
+                    }).catch(function (e) {
+                        layer.msg('操作失败');
+                    });
                     // obj.del();
                     layer.close(index);
                 });

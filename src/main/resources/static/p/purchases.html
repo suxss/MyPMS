@@ -6,6 +6,7 @@
     <title>查看采购流程-采购员端</title>
     <link rel="stylesheet" href="../layui/css/layui.css">
     <script src="../js/jquery.min.js"></script>
+    <script src="../js/main.js"></script>
 </head>
 <body>
 <div class="layui-layout layui-layout-admin">
@@ -26,13 +27,13 @@
             <li class="layui-nav-item layui-hide layui-show-md-inline-block">
                 <a href="javascript:;">
                     <img src="../pic/avataaars.png" class="layui-nav-img">
-                    tester
+					<span id="username_label">xxx</span>
                 </a>
-                <dl class="layui-nav-child">
-                    <dd><a href="">资料</a></dd>
-                    <dd><a href="">设置</a></dd>
-                    <dd><a href="">注销</a></dd>
-                </dl>
+				<dl class="layui-nav-child">
+					<!--                    <dd><a href="">资料</a></dd>-->
+					<!--                    <dd><a href="">设置</a></dd>-->
+					<dd><a href="javascript: main();">注销</a></dd>
+				</dl>
             </li>
             <li class="layui-nav-item" lay-header-event="menuRight" lay-unselect>
                 <a href="javascript:;">
@@ -142,17 +143,17 @@
             , toolbar: true
             , escape: true
             , limit: 20
-            , url: '../testdata/demand.json' //数据接口  query_processing_path
+            , url: query_processing_path //数据接口  query_processing_path
             , page: true //开启分页
             , request: {
                 pageName: 'curr' //页码的参数名称，默认：page
                 , limitName: 'nums' //每页数据量的参数名，默认：limit
             } // ?curr=1&nums=30
             , parseData: function (res) { //res 即为原始返回的数据
-                // for (var i = 0; i < res.data.length; i++) {
-                //     res.data[i].expire_time = new Date(res.data[i].expire_time).toLocaleString();
-                //     res.data[i]['total_price'] = res.data[i]['unit_price'] * res.data[i]['amount'];
-                // }
+                for (var i = 0; i < res.data.length; i++) {
+                    res.data[i].id = res.data[i].pid;
+                    res.data[i].start_time = new Date(res.data[i].start_time).toLocaleString();
+                }
                 return {
                     "code": res.code, //解析接口状态
                     "msg": res.msg, //解析提示文本
@@ -165,8 +166,9 @@
                 , {field: 'status', title: '当前状态', width: 120, sort: true}
                 , {field: 'product_name', title: '产品名', width: 120}
                 , {field: 'amount', title: '采购数量', width: 120, sort: true}
-                , {field: 'vid', title: '供应商编号', width: 120, sort: true}
-                , {field: 'cid', title: '合同编号'}
+                , {field: 'start_time', title: '开始时间', width: 180, sort: true}
+                , {field: 'v_uid', title: '供应商', width: 180, sort: true}
+                , {field: 'cname', title: '合同文件名'}
                 , {title: '操作', width: 180, fixed: 'right', toolbar: '#barDemo'}
             ]]
             , defaultToolbar: ['filter', 'print', 'exports',

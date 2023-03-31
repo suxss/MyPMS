@@ -231,22 +231,23 @@
             }
         })
 
+        function isvalid() {
+            if ($('#pwd').val() != $('#rpwd').val()) return -3;
+            if (!(slider.isOk())) return -4;
+            return 0;
+        }
+
     });
 
-    function isvalid() {
-        if ($('#pwd').val() != $('#rpwd').val()) return -3;
-        if (!(slider.isOk())) return -4;
-        return 0;
-    }
 
     function register_v(flag) {
         switch (flag) {
             case 0 :
                 const username = $("input[name='username']").val()
-					, email = $("input[name='email']").val()
-					, pwd = $("input[name='password']").val()
-					, phone = $("input[name='phone']").val()
-					, address = $("input[name='address']").val();
+                    , email = $("input[name='email']").val()
+                    , pwd = $("input[name='password']").val()
+                    , phone = $("input[name='phone']").val()
+                    , address = $("input[name='address']").val();
                 reg_v(username, email, pwd, phone, address)
 				.then(function(data) {
                     if (data.code == 0) {

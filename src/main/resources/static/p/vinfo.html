@@ -72,38 +72,47 @@
 </body>
 <script>
     const searchParams = new URLSearchParams(window.location.search)
-		, vid = searchParams.get('vid')
-		, query_path = 'query/v_info';
-    let info = query_v_info(vid);
+        , vid = searchParams.get('v_uid')
+        , query_path = 'query/v_info';
+
 
     layui.use(['rate'], function () {
         var rate = layui.rate
             , $ = layui.$;
 
-        $("#name").text(info.name);
-		$("#email").text(info.email);
-		$("#phone").text(info.phone);
-		$("#address").text(info.address);
-		$("#rate_num").text(info.rate_num);
+        query_v_info(vid).then(function (info) {
+            $("#name").text(info.uname);
+            $("#email").text(info.email);
+            $("#phone").text(info.phone);
+            $("#address").text(info.address);
+            $("#rate_num").text(info.rate_num);
+            rate.render({
+                elem: '#rate'
+                , value: info.rate.toString()
+                , half: true
+                , readonly: true
+            })
+        }, function (error) {
+            console.log(error);
+            layer.msg('查询失败', {icon: 2});
+        });
 
 
-        rate.render({
-			elem: '#rate'
-			,value: info.rate.toString()
-			,half: true
-			,readonly: true
-		})
     });
 
     function query_v_info(vid) {
         return new Promise((resolve, reject) => {
             fetch(query_path, {
-                method: 'post', body: 'vid=' + vid, headers: {
-                    "Content-Type": "application/x-www-form-urlencoded; charset=UTF-8"
+                method: 'post',
+                body: JSON.stringify({
+                    vid: vid
+                }),
+                headers: {
+                    "Content-Type": "application/json"
                 }
             }).then(response => response.json())
                 .then(data => {
-					resolve(data.date)
+                    resolve(data.data)
                 })
 				.catch(error => {
                     console.log(error);

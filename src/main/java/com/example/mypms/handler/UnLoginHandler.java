@@ -16,13 +16,18 @@ import java.io.IOException;
 public class UnLoginHandler implements AuthenticationEntryPoint {
     @Override
     public void commence(HttpServletRequest request, HttpServletResponse response, AuthenticationException authException) throws IOException, ServletException {
+        String method = request.getMethod();
+        if (method.equals("GET")) {
+            response.sendRedirect("/login.html");
+            return;
+        }
         ObjectMapper mapper = new ObjectMapper();
         ObjectNode node = mapper.createObjectNode();
         if (authException instanceof BadCredentialsException) {
-            node.put("code", "501");
+            node.put("code", 501);
             node.put("msg", "账号或密码错误");
         } else {
-            node.put("code", "401");
+            node.put("code", 401);
             node.put("msg", "未登录");
         }
 

@@ -1,5 +1,6 @@
 package com.example.mypms.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -14,10 +15,12 @@ public class User implements UserDetails {
     private String uid;
     private String uname;
     private String email;
+    @JsonIgnore
     private String pwd;
     private int rid;
     private float rate;
     private int rate_num;
+    @JsonIgnore
     private Role role;
 
     @Override

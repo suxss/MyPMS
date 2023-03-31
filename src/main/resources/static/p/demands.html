@@ -6,6 +6,7 @@
     <title>查看采购需求-采购员端</title>
     <link rel="stylesheet" href="../layui/css/layui.css">
     <script src="../js/jquery.min.js"></script>
+    <script src="../js/main.js"></script>
 </head>
 <body>
 <div class="layui-layout layui-layout-admin">
@@ -26,12 +27,12 @@
             <li class="layui-nav-item layui-hide layui-show-md-inline-block">
                 <a href="javascript:;">
                     <img src="../pic/avataaars.png" class="layui-nav-img">
-                    tester
+                    <span id="username_label">xxx</span>
                 </a>
                 <dl class="layui-nav-child">
-                    <dd><a href="">资料</a></dd>
-                    <dd><a href="">设置</a></dd>
-                    <dd><a href="">注销</a></dd>
+                    <!--                    <dd><a href="">资料</a></dd>-->
+                    <!--                    <dd><a href="">设置</a></dd>-->
+                    <dd><a href="javascript: main();">注销</a></dd>
                 </dl>
             </li>
             <li class="layui-nav-item" lay-header-event="menuRight" lay-unselect>
@@ -85,7 +86,7 @@
         </div>
     </div>
 
-    <div class="layui-body">
+    <div class="layui-body layui-bg-gray">
         <!-- 内容主体区域 -->
         <div style="padding: 15px;">
 
@@ -144,20 +145,20 @@
             , toolbar: true
             , escape: true
             , limit: 20
-            , url: '../testdata/demand.json' //数据接口 //query_demands_path
+            , url: query_demands_path //数据接口 //query_demands_path '../testdata/demand.json'
             , page: true //开启分页
             , request: {
                 pageName: 'curr' //页码的参数名称，默认：page
                 , limitName: 'nums' //每页数据量的参数名，默认：limit
             } // ?curr=1&nums=30
             , parseData: function (res) { //res 即为原始返回的数据
-                // for (var i = 0; i < res.data.length; i++) {
-                //     res.data[i].expire_time = new Date(res.data[i].expire_time).toLocaleString();
-                //     res.data[i]['total_price'] = res.data[i]['unit_price'] * res.data[i]['amount'];
-                // }
+                for (var i = 0; i < res.data.length; i++) {
+                    res.data[i].id = res.data[i].pdid;
+                    res.data[i].expire_time = new Date(res.data[i].expire_time).toLocaleString();
+                }
                 return {
                     "code": res.code, //解析接口状态
-                    "msg": res.message, //解析提示文本
+                    "msg": res.msg, //解析提示文本
                     "count": res.total, //解析数据长度
                     "data": res.data //解析数据列表
                 };
@@ -185,18 +186,21 @@
                 window.location.href = 'quote.html?id=' + data.id;
             } else if (obj.event === 'del') {
                 layer.confirm('真的删除行么', function (index) {
-                    let t = deleteByDid(data.id);
-                    if (t.code === 0) {
-                        obj.del();
-                        layer.close(index);
-                    } else {
-                        layer.msg(t.message);
-                    }
+                    deleteByDid(data.id).then(t => {
+                        if (t.code == 0) {
+                            obj.del();
+                            layer.close(index);
+                        } else {
+                            layer.msg(t.msg);
+                        }
+                    }).catch(err => {
+                        layer.msg(err);
+                    });
                 });
             }
         });
 
-        function deleteByDid(did) {
+        function deleteByDid(pdid) {
             return new Promise((resolve, reject) => {
                 fetch(delete_path, {
                     method: 'POST',
@@ -204,7 +208,7 @@
                         'Content-Type': 'application/json'
                     },
                     body: JSON.stringify({
-                        did: did
+                        pdid: pdid
                     })
                 }).then(res => res.json())
                 .then(res => {
