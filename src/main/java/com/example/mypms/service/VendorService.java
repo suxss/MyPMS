@@ -1,19 +1,27 @@
 package com.example.mypms.service;
 
 import com.example.mypms.mapper.VendorMapper;
-import com.example.mypms.model.Procurement;
-import com.example.mypms.model.ProcurementDemand;
-import com.example.mypms.model.Purchaser;
-import com.example.mypms.model.Quote;
+import com.example.mypms.model.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 
 @Service
 public class VendorService {
+    @Value(value = "${file.save_path}")
+    private String FILE_SAVE_PATH;
+    @Value(value = "${file.expire_days}")
+    private float EXPIRE_DAYS;
     @Autowired
     VendorMapper vendorMapper;
+
+    private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
     /**
      * 获取所有采购需求
@@ -120,5 +128,73 @@ public class VendorService {
      */
     public Purchaser getPurchaserByUid(String p_uid) {
         return vendorMapper.getPurchaserByUid(p_uid);
+    }
+
+    /**
+     * 获取采购状态
+     *
+     * @param pid 采购id
+     * @param uid 用户id
+     * @return 采购状态
+     */
+    public int getStatus(int pid, String uid) {
+        return vendorMapper.getStatusByPidAndUid(pid, uid);
+    }
+
+    /**
+     * 更新采购记录中的合同相应字段
+     *
+     * @param pid         采购id
+     * @param filename    文件名
+     * @param newFilename 新文件名
+     * @return 1 - 更新成功, 0 - 更新失败
+     */
+    public int updateContract(int pid, String filename, String newFilename) {
+        String path = FILE_SAVE_PATH + newFilename;
+        String expireTime = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date((long) (System.currentTimeMillis() + 1000 * 60 * 60 * 24 * EXPIRE_DAYS)));
+        return vendorMapper.updateContract(pid, filename, path, expireTime);
+    }
+
+    /**
+     * 获取合同存储路径与文件名
+     *
+     * @param pid 采购id
+     * @param uid 采购员用户id
+     * @return 合同存储路径与文件名
+     */
+    public Contract getContractPathAndName(int pid, String uid) {
+        int status = vendorMapper.getStatusByPidAndUid(pid, uid);
+        if (status == 2)
+            return vendorMapper.getContractPathAndName(pid);
+        return null;
+    }
+
+    public int deleteProcurement(int pid, String uid) {
+        if (!isProcurementBelongToVendor(pid, uid))
+            return 0;
+        return vendorMapper.deleteProcurement(pid);
+    }
+
+    private boolean isProcurementBelongToVendor(int pid, String uid) {
+        return vendorMapper.getStatusByPidAndUid(pid, uid) > 0;
+    }
+
+    public int confirmSend(int pid, String uid) {
+        if (!isProcurementBelongToVendor(pid, uid))
+            return 0;
+        return vendorMapper.nextStep(pid, 4);
+    }
+
+    public int updateRate(int pid, String uid, double rate) {
+        if (!isProcurementBelongToVendor(pid, uid))
+            return 0;
+        int status = vendorMapper.getStatusByPidAndUid(pid, uid);
+        if (status != 7)
+            return 0;
+        String p_uid = vendorMapper.getPuidByPid(pid);
+        int r = vendorMapper.nextStep(pid, status);
+        if (r == 0)
+            return 0;
+        return vendorMapper.updateRate(p_uid, rate);
     }
 }

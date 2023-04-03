@@ -49,15 +49,32 @@
     </delete>
 
     <select id="getProcurementsByUid" resultType="com.example.mypms.model.Procurement">
-        select *
+        select pid,
+               qid,
+               pdid,
+               status,
+               start_time,
+               p_uid,
+               p_name,
+               product_name,
+               amount,
+               total_price,
+               cname,
+               cpath,
+               cexpire_time,
+               remark
         from processing
         where v_uid = #{v_uid}
+          and status > 0
+          and 8 > processing.status
         limit #{size} offset #{offset}
     </select>
     <select id="getProcurementsCountByUid" resultType="int">
         select count(*)
         from processing
         where v_uid = #{v_uid}
+          and status > 0
+          and 8 > processing.status
     </select>
 
     <select id="getPurchaserByUid" resultType="com.example.mypms.model.Purchaser">
@@ -66,4 +83,68 @@
         where uid = #{uid}
         limit 1
     </select>
+
+    <select id="getStatusByPidAndUid" resultType="int">
+        select status
+        from processing
+        where pid = #{pid}
+          and v_uid = #{uid}
+    </select>
+
+    <update id="updateContract">
+        update procurement
+        set cname        = #{filename},
+            cpath        = #{path},
+            cexpire_time = #{expire_time},
+            status       = 3
+        where pid = #{pid}
+    </update>
+
+    <select id="getContractPathAndName" parameterType="int" resultType="com.example.mypms.model.Contract">
+        select cpath as path, cname as name
+        from procurement
+        where pid = #{pid}
+    </select>
+
+    <delete id="deleteProcurement">
+        delete
+        from procurement
+        where pid = #{pid}
+          and status = 2
+    </delete>
+
+    <select id="getProcurementsCountByPidAndUid">
+        select count(*)
+        from processing
+        where pid = #{pid}
+          and v_uid = #{uid}
+    </select>
+
+    <update id="nextStep">
+        update procurement
+        set status = #{current_status} + 1
+        where pid = #{pid}
+          and status = #{current_status}
+    </update>
+
+    <select id="getPuidByPid" resultType="java.lang.String">
+        select p_uid
+        from processing
+        where pid = #{pid}
+          and status > 0
+          and 8 > processing.status
+    </select>
+
+    <update id="updateRate">
+        update purchaser
+        set rate     = (rate * rate_num + #{rate}) / (rate_num + 1),
+            rate_num = rate_num + 1
+        where uid = #{uid}
+    </update>
+
+    <update id="finishProcurement">
+        update procurement
+        set status = -1
+        where pid = #{pid}
+    </update>
 </mapper>

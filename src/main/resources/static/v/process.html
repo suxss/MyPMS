@@ -221,14 +221,15 @@
                                 <div>
                                     <form class="layui-form" style="margin: 0 auto;max-width: 460px;padding-top: 40px;">
                                         <center>
+                                            <span id="rate_title">请对采购员进行评价</span>
                                             <div class="layui-form-item">
                                                 <div id="rate"></div>
                                             </div>
-                                            <div class="layui-form-item">
-                                                <div class="layui-btn" id="rateBtn">
-                                                    提交
-                                                </div>
-                                            </div>
+                                            <!--                                            <div class="layui-form-item">-->
+                                            <!--                                                <div class="layui-btn" id="rateBtn">-->
+                                            <!--                                                    提交-->
+                                            <!--                                                </div>-->
+                                            <!--                                            </div>-->
                                         </center>
                                     </form>
                                 </div>
@@ -266,9 +267,8 @@
             , download_path = 'download/contract'
             , cancel_path = 'delete/processing'
             , confirm_path = 'confirm/send'
-            , rate_path = 'add/rate';
-    const debugFlag = false
-            , status = getStatus();
+            , rate_path = 'update/rate';
+    const debugFlag = false;
 
     $("#id").text(id);
     $("#downloadBtn").attr("href", download_path + "?id=" + id);
@@ -305,42 +305,86 @@
             , upload = layui.upload
             , step = layui.step
             , form = layui.form
-            , rate = layui.rate
-            , $ = layui.$;
+                , rate = layui.rate
+                , $ = layui.$;
 
-        if(status >=1 && status <= 6) {
-            for (let i = 0; i < status; i++) {
-                next();
-            }
-        }
 
         rate.render({
             elem: '#rate'
-            ,value: '0'
-            ,half: true
-            ,text: true
-        })
+            , value: '0'
+            , half: true
+            , text: true
+            , choose: function (value) {
+                layer.confirm('您的评分是：' + value + '分', {
+                    btn: ['提交', '取消']
+                }, function (index) {
+                    fetch(rate_path, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({
+                            id: id,
+                            rate: value
+                        })
+                    }).then(res => res.json())
+                            .then(function (data) {
+                                if (data.code === 0) {
+                                    layer.msg('已评价', {icon: 1});
+                                    location.href = 'purchases.html';
+                                } else {
+                                    layer.msg(data.msg, {icon: 2});
+                                }
+                            }).catch(function (err) {
+                        layer.msg('网络错误', {icon: 2});
+                    });
+                    layer.close(index);
+                    setTimeout(function () {
+                        location.href = 'purchases.html';
+                    }, 1000);
+                }, function (index) {
+                    layer.close(index);
+                });
+            }
+        });
+
+        getStatus().then(status => {
+            if (status == 6) {
+                $("#rate_title").text("请等待对方评价");
+                $("#rate").hide();
+            }
+            if (status == 7) {
+                status = 6;
+            }
+            if (status >= 1 && status <= 6) {
+                for (let i = 1; i < status; i++) {
+                    setTimeout(function () {
+                        next();
+                    }, 400 * i);
+                }
+            }
+        }).catch(err => console.log(err));
+
 
         upload.render({
             elem: '#upload2'
-            ,accept: 'file'
-            ,exts: 'pdf|doc|docx'
-            ,auto: false
-            ,multiple: false
-            ,data: {
+            , accept: 'file'
+            , exts: 'pdf|doc|docx'
+            , auto: false
+            , multiple: false
+            , data: {
                 "id": id
             }
-            ,bindAction: '#submitBtn1'
-            ,size: 1024 * 10
-            ,url: 'https://httpbin.org/post' //此处用的是第三方的 http 请求演示，实际使用时改成您自己的上传接口即可。
+            , bindAction: '#submitBtn1'
+            , size: 1024 * 10
+            , url: upload_path //此处用的是第三方的 http 请求演示，实际使用时改成您自己的上传接口即可。 'https://httpbin.org/post'
             // upload_path
-            ,done: function(res){
-                res = JSON.parse(res);
+            , done: function (res) {
                 if (res.code == 0) {
                     layer.msg('上传成功');
                     next();
                 } else {
-                    layer.msg('上传失败');
+                    layer.msg(res.msg);
                 }
             }
         });
@@ -417,7 +461,7 @@
                     headers: {
                         'Content-Type': 'application/json'
                     },
-                    data: JSON.stringify({
+                    body: JSON.stringify({
                         id: id
                     })
                 }).then(res => res.json())
@@ -435,31 +479,31 @@
             });
         });
 
-        $("#rateBtn").on('click', function () {
-            layer.confirm('确定提交评价吗？', function (index) {
-                fetch(rate_path, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    data: JSON.stringify({
-                        id: id,
-                        rate: rate.getValue()
-                    })
-                }).then(res => res.json())
-                .then(function (data) {
-                    if (data.code == 0) {
-                        layer.msg('评价成功');
-                        next();
-                    } else {
-                        layer.msg(data.msg);
-                    }
-                }).catch(function (err) {
-                    layer.msg(err);
-                });
-                layer.close(index);
-            });
-        });
+        // $("#rateBtn").on('click', function () {
+        //     layer.confirm('确定提交评价吗？', function (index) {
+        //         fetch(rate_path, {
+        //             method: 'POST',
+        //             headers: {
+        //                 'Content-Type': 'application/json'
+        //             },
+        //             body: JSON.stringify({
+        //                 id: id,
+        //                 rate: rate.getValue()
+        //             })
+        //         }).then(res => res.json())
+        //         .then(function (data) {
+        //             if (data.code == 0) {
+        //                 layer.msg('评价成功');
+        //                 next();
+        //             } else {
+        //                 layer.msg(data.msg);
+        //             }
+        //         }).catch(function (err) {
+        //             layer.msg(err);
+        //         });
+        //         layer.close(index);
+        //     });
+        // });
 
         function next() {
             step.next('#stepForm');

@@ -1,16 +1,26 @@
 package com.example.mypms.controller;
 
 import com.example.mypms.model.*;
+import com.example.mypms.service.FileManageService;
 import com.example.mypms.service.PurchaserService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Map;
 
 import static java.lang.Integer.parseInt;
@@ -19,6 +29,8 @@ import static java.lang.Integer.parseInt;
 public class PurchaserController {
     @Autowired
     PurchaserService purchaserService;
+    @Autowired
+    FileManageService fileManageService;
 
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
@@ -256,7 +268,7 @@ public class PurchaserController {
         User user = (User) request.getSession().getAttribute("user");
         int qid;
         try {
-            qid = (int) params.get("qid");
+            qid = parseInt((String) params.get("qid"));
         } catch (NumberFormatException e) {
             logger.error("agreeQuote >> qid is not a number");
             resultJson.setCode(-1);
@@ -298,7 +310,7 @@ public class PurchaserController {
         User user = (User) request.getSession().getAttribute("user");
         int pdid;
         try {
-            pdid = (int) params.get("pdid");
+            pdid = parseInt((String) params.get("pdid"));
         } catch (NumberFormatException e) {
             logger.error("deleteDemand >> pdid is not a number");
             resultJson.setCode(-1);
@@ -329,6 +341,230 @@ public class PurchaserController {
         } else {
             resultJson.setCode(-1);
             resultJson.setMsg("操作失败");
+            resultJson.setData(null);
+            return resultJson;
+        }
+    }
+
+    @RequestMapping(value = "/p/upload/contract", method = RequestMethod.POST)
+    public ResultJson uploadContract(HttpServletRequest request, @RequestParam("file") MultipartFile file, @RequestParam("id") int id) {
+        ResultJson resultJson = new ResultJson();
+        User user = (User) request.getSession().getAttribute("user");
+        if (user == null) {
+            resultJson.setCode(-1);
+            resultJson.setMsg("请先登录");
+            return resultJson;
+        }
+        if (purchaserService.getStatus(id, user.getUid()) != 1) {
+            resultJson.setCode(-1);
+            resultJson.setMsg("当前流程无需上传合同");
+            return resultJson;
+        }
+        String newFilename = fileManageService.getNewFileName(file);
+        try {
+            fileManageService.fileUpload(file.getBytes(), newFilename);
+        } catch (IOException e) {
+//            throw new RuntimeException(e);
+            resultJson.setCode(-1);
+            resultJson.setMsg("文件上传出错");
+            return resultJson;
+        }
+        int r = purchaserService.updateContract(id, file.getOriginalFilename(), newFilename);
+        if (r > 0) {
+            resultJson.setCode(0);
+            resultJson.setMsg("上传成功");
+        }
+        logger.info("upload contract >> filename: " + file.getOriginalFilename() + ", id: " + id + ", uid:" + user.getUid());
+        return resultJson;
+    }
+
+    @RequestMapping(value = "/p/download/contract", method = RequestMethod.GET)
+    public void downloadContract(HttpServletRequest request, @RequestParam("id") int id, HttpServletResponse response) {
+        User user = (User) request.getSession().getAttribute("user");
+        if (user == null) {
+            return;
+        }
+        Contract contract = purchaserService.getContractPathAndName(id, user.getUid());
+        if (contract == null) {
+            return;
+        }
+        try {
+            InputStream inputStream = new FileInputStream(contract.getPath());// 文件的存放路径
+            response.reset();
+            response.setContentType("application/octet-stream");
+            String filename = contract.getName();
+            response.addHeader("Content-Disposition", "attachment; filename=" + URLEncoder.encode(filename, StandardCharsets.UTF_8));
+            ServletOutputStream outputStream = response.getOutputStream();
+            byte[] b = new byte[1024];
+            int len;
+            //从输入流中读取一定数量的字节，并将其存储在缓冲区字节数组中，读到末尾返回-1
+            while ((len = inputStream.read(b)) > 0) {
+                outputStream.write(b, 0, len);
+            }
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @RequestMapping(value = "/p/query/status", method = RequestMethod.GET)
+    public ResultJson getStatus(HttpServletRequest request, @RequestParam("id") int id) {
+        ResultJson resultJson = new ResultJson();
+        User user = (User) request.getSession().getAttribute("user");
+        if (user == null) {
+            resultJson.setCode(-1);
+            resultJson.setMsg("请先登录");
+        }
+        int status = purchaserService.getStatus(id, user.getUid());
+        resultJson.setCode(0);
+        resultJson.setMsg("查询成功");
+        HashMap<String, Object> hashMap = new HashMap<>();
+        hashMap.put("status", status);
+        resultJson.setData(hashMap);
+        return resultJson;
+    }
+
+    @RequestMapping(value = "/p/delete/processing", method = RequestMethod.POST)
+    public ResultJson deleteProcurement(HttpServletRequest request, @RequestBody Map<String, Object> params) {
+        ResultJson resultJson = new ResultJson();
+        User user = (User) request.getSession().getAttribute("user");
+        int id;
+        if (user == null) {
+            resultJson.setCode(-1);
+            resultJson.setMsg("请先登录");
+            return resultJson;
+        }
+        try {
+            id = parseInt((String) params.get("id"));
+        } catch (NumberFormatException e) {
+            resultJson.setCode(-1);
+            resultJson.setMsg("id必须为数字");
+            return resultJson;
+        } catch (NullPointerException e) {
+            resultJson.setCode(-1);
+            resultJson.setMsg("id不能为空");
+            return resultJson;
+        }
+        int r = purchaserService.deleteProcurement(id, user.getUid());
+        if (r > 0) {
+            resultJson.setCode(0);
+            resultJson.setMsg("删除成功");
+            resultJson.setData(null);
+            return resultJson;
+        } else {
+            resultJson.setCode(-1);
+            resultJson.setMsg("删除失败");
+            resultJson.setData(null);
+            return resultJson;
+        }
+    }
+
+    @RequestMapping(value = "/p/agree/contract", method = RequestMethod.POST)
+    public ResultJson agreeContract(HttpServletRequest request, @RequestBody Map<String, Object> params) {
+        ResultJson resultJson = new ResultJson();
+        User user = (User) request.getSession().getAttribute("user");
+        int id;
+        if (user == null) {
+            resultJson.setCode(-1);
+            resultJson.setMsg("请先登录");
+            return resultJson;
+        }
+        try {
+            id = parseInt((String) params.get("id"));
+        } catch (NumberFormatException e) {
+            resultJson.setCode(-1);
+            resultJson.setMsg("id必须为数字");
+            return resultJson;
+        } catch (NullPointerException e) {
+            resultJson.setCode(-1);
+            resultJson.setMsg("id不能为空");
+            return resultJson;
+        }
+        int r = purchaserService.agreeContract(id, user.getUid());
+        if (r > 0) {
+            resultJson.setCode(0);
+            resultJson.setMsg("操作成功");
+            resultJson.setData(null);
+            return resultJson;
+        } else {
+            resultJson.setCode(-1);
+            resultJson.setMsg("操作失败");
+            resultJson.setData(null);
+            return resultJson;
+        }
+    }
+
+    @RequestMapping(value = "/p/confirm/delivery", method = RequestMethod.POST)
+    public ResultJson confirmDelivery(HttpServletRequest request, @RequestBody Map<String, Object> params) {
+        ResultJson resultJson = new ResultJson();
+        User user = (User) request.getSession().getAttribute("user");
+        int id;
+        if (user == null) {
+            resultJson.setCode(-1);
+            resultJson.setMsg("请先登录");
+            return resultJson;
+        }
+        try {
+            id = parseInt((String) params.get("id"));
+        } catch (NumberFormatException e) {
+            resultJson.setCode(-1);
+            resultJson.setMsg("id必须为数字");
+            return resultJson;
+        } catch (NullPointerException e) {
+            resultJson.setCode(-1);
+            resultJson.setMsg("id不能为空");
+            return resultJson;
+        }
+        int r = purchaserService.confirmDelivery(id, user.getUid());
+        if (r > 0) {
+            resultJson.setCode(0);
+            resultJson.setMsg("操作成功");
+            resultJson.setData(null);
+            return resultJson;
+        } else {
+            resultJson.setCode(-1);
+            resultJson.setMsg("操作失败");
+            resultJson.setData(null);
+            return resultJson;
+        }
+    }
+
+    @RequestMapping(value = "/p/update/rate", method = RequestMethod.POST)
+    public ResultJson updateRate(HttpServletRequest request, @RequestBody Map<String, Object> params) {
+        ResultJson resultJson = new ResultJson();
+        User user = (User) request.getSession().getAttribute("user");
+        int id;
+        double rate;
+        if (user == null) {
+            resultJson.setCode(-1);
+            resultJson.setMsg("请先登录");
+            return resultJson;
+        }
+        try {
+            id = parseInt(params.get("id").toString());
+            rate = Double.parseDouble((params.get("rate").toString()));
+        } catch (NumberFormatException e) {
+            resultJson.setCode(-1);
+            resultJson.setMsg("id, rate 必须为数字");
+            return resultJson;
+        } catch (NullPointerException e) {
+            resultJson.setCode(-1);
+            resultJson.setMsg("id, rate 不能为空");
+            return resultJson;
+        }
+        if (purchaserService.getStatus(id, user.getUid()) != 6) {
+            resultJson.setCode(-1);
+            resultJson.setMsg("当前流程无需评价");
+            return resultJson;
+        }
+        int r = purchaserService.updateRate(id, user.getUid(), rate);
+        if (r > 0) {
+            resultJson.setCode(0);
+            resultJson.setMsg("修改成功");
+            resultJson.setData(null);
+            return resultJson;
+        } else {
+            resultJson.setCode(-1);
+            resultJson.setMsg("修改失败");
             resultJson.setData(null);
             return resultJson;
         }

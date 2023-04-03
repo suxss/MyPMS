@@ -145,8 +145,8 @@
             } // ?curr=1&nums=30
             , parseData: function (res) { //res 即为原始返回的数据
                 for (var i = 0; i < res.data.length; i++) {
-                    res.data[i].expire_time = new Date(res.data[i].expire_time).toLocaleString();
-                    res.data[i]['total_price'] = res.data[i]['unit_price'] * res.data[i]['amount'];
+                    res.data[i].id = res.data[i].pid;
+                    res.data[i].start_time = new Date(res.data[i].start_time).toLocaleString();
                 }
                 return {
                     "code": res.code, //解析接口状态
@@ -156,12 +156,14 @@
                 };
             }
             , cols: [[ //表头
-                {field: 'id', title: '采购编号', width: 140, sort: true, fixed: 'left'}
-                , {field: 'status', title: '当前状态', width: 120, sort: true}
+                {field: 'id', title: '采购编号', width: 100, sort: true, fixed: 'left'}
+                , {field: 'status', title: '当前状态', width: 100, sort: true}
                 , {field: 'product_name', title: '产品名', width: 120}
                 , {field: 'amount', title: '采购数量', width: 120, sort: true}
-                , {field: 'pname', title: '采购员', width: 120, sort: true}
-                , {field: 'cid', title: '合同编号'}
+                , {field: 'total_price', title: '总价', width: 120, sort: true}
+                , {field: 'start_time', title: '开始时间', width: 160, sort: true}
+                , {field: 'p_name', title: '采购员', width: 120, sort: true}
+                , {field: 'cname', title: '合同文件名'}
                 , {title: '操作', width: 220, fixed: 'right', toolbar: '#barDemo'}
             ]]
             , defaultToolbar: ['filter', 'print', 'exports',

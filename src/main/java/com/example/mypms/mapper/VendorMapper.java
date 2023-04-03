@@ -1,9 +1,6 @@
 package com.example.mypms.mapper;
 
-import com.example.mypms.model.Procurement;
-import com.example.mypms.model.ProcurementDemand;
-import com.example.mypms.model.Purchaser;
-import com.example.mypms.model.Quote;
+import com.example.mypms.model.*;
 import org.apache.ibatis.annotations.Mapper;
 import org.springframework.stereotype.Repository;
 
@@ -29,4 +26,20 @@ public interface VendorMapper {
     int getProcurementsCountByUid(String v_uid);
 
     Purchaser getPurchaserByUid(String p_uid);
+
+    int getStatusByPidAndUid(int pid, String uid);
+
+    int updateContract(int pid, String filename, String path, String expire_time);
+
+    Contract getContractPathAndName(int pid);
+
+    int deleteProcurement(int pid);
+
+    int nextStep(int pid, int current_status);
+
+    int updateRate(String uid, double rate);
+
+    String getPuidByPid(int pid);
+
+    int finishProcurement(int pid);
 }
