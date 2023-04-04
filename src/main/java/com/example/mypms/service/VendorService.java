@@ -94,6 +94,8 @@ public class VendorService {
      * @return 1:成功 0:失败
      */
     public int deleteQuote(int qid, String v_uid) {
+        if (isQuoteBeAgreed(qid))
+            return 0;
         return vendorMapper.deleteQuote(qid, v_uid);
     }
 
@@ -196,5 +198,33 @@ public class VendorService {
         if (r == 0)
             return 0;
         return vendorMapper.updateRate(p_uid, rate);
+    }
+
+    public BasicInfo getBasicInfo(String uid) {
+        int demands_count = getAllDemandsCount();
+        int quotes_count = getQuotesCountByUid(uid);
+        int processing_count = getProcurementsCountByUid(uid);
+        float current_rate = vendorMapper.getVendorRate(uid);
+        ArrayList<LineChartData> chartData = vendorMapper.getChartData(uid);
+        BasicInfo basicInfo = new BasicInfo();
+        ArrayList<String> labels = new ArrayList<>();
+        ArrayList<Integer> counts = new ArrayList<>();
+        for (LineChartData chartDataItem :
+                chartData) {
+            labels.add(chartDataItem.getLabel());
+            counts.add(chartDataItem.getCount());
+        }
+        basicInfo.setLabels(labels);
+        basicInfo.setCounts(counts);
+        basicInfo.setDemands_count(demands_count);
+        basicInfo.setQuotes_count(quotes_count);
+        basicInfo.setProcessing_count(processing_count);
+        basicInfo.setCurrent_rate(current_rate);
+        return basicInfo;
+    }
+
+    public boolean isQuoteBeAgreed(int qid) {
+        int r = vendorMapper.isQuoteBeAgreed(qid);
+        return r > 0;
     }
 }

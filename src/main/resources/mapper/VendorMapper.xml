@@ -30,15 +30,28 @@
     </insert>
 
     <select id="getQuotesByUid" resultType="com.example.mypms.model.Quote">
-        select *
-        from quote
-        where v_uid = #{v_uid}
+        select amount,
+               p_id,
+               qid,
+               remark,
+               total_price,
+               v_uid,
+               uname,
+               product_name
+        from (select amount, p_id, qid, remark, total_price, v_uid from quote where v_uid = #{v_uid}) as t1
+                 inner join (select pdid, p_uid, p.uname, pd.product_name
+                             from pd
+                                      inner join purchaser p on pd.p_uid = p.uid) as t2 on t1.p_id = t2.pdid
+        where qid not in (select qid from processing)
         limit #{size} offset #{offset}
     </select>
     <select id="getQuotesCountByUid" resultType="int">
         select count(*)
-        from quote
-        where v_uid = #{v_uid}
+        from (select amount, p_id, qid, remark, total_price, v_uid from quote where v_uid = #{v_uid}) as t1
+                 inner join (select pdid, p_uid, p.uname, pd.product_name
+                             from pd
+                                      inner join purchaser p on pd.p_uid = p.uid) as t2 on t1.p_id = t2.pdid
+        where qid not in (select qid from processing)
     </select>
 
     <delete id="deleteQuote">
@@ -47,6 +60,12 @@
         where qid = #{qid}
           and v_uid = #{v_uid}
     </delete>
+
+    <select id="isQuoteBeAgreed" resultType="int">
+        select count(*)
+        from processing
+        where qid = #{qid}
+    </select>
 
     <select id="getProcurementsByUid" resultType="com.example.mypms.model.Procurement">
         select pid,
@@ -147,4 +166,33 @@
         set status = -1
         where pid = #{pid}
     </update>
+
+    <select id="getVendorRate" resultType="float">
+        select rate
+        from vendor
+        where uid = #{uid}
+        limit 1
+    </select>
+
+    <select id="getChartData" resultType="com.example.mypms.model.LineChartData">
+        select t2.label as `label`, coalesce(counts, 0) as `count`
+        from (select cast(t.start_time as DATE) as label, count(*) as counts
+              from (select * from pd where start_time > date_sub(now(), INTERVAL 7 DAY) and expire_time > now()) as t
+              group by day(t.start_time)) as t1
+                 right join
+             (select DATE_SUB(curdate(), INTERVAL 0 DAY) label
+              union
+              select DATE_SUB(curdate(), INTERVAL 1 DAY) label
+              union
+              select DATE_SUB(curdate(), INTERVAL 2 DAY) label2
+              union
+              select DATE_SUB(curdate(), INTERVAL 3 DAY) label3
+              union
+              select DATE_SUB(curdate(), INTERVAL 4 DAY) label4
+              union
+              select DATE_SUB(curdate(), INTERVAL 5 DAY) label5
+              union
+              select DATE_SUB(curdate(), INTERVAL 6 DAY) label6) as t2 on t1.label = t2.label
+        order by label
+    </select>
 </mapper>

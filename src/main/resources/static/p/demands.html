@@ -11,7 +11,7 @@
 <body>
 <div class="layui-layout layui-layout-admin">
     <div class="layui-header">
-        <div class="layui-logo layui-hide-xs layui-bg-black">
+        <div class="layui-logo layui-hide-xs layui-bg-black" onclick="window.location.href='index.html'">
             采购管理系统
         </div>
 
@@ -185,7 +185,7 @@
             if (obj.event === 'detail') {
                 window.location.href = 'quote.html?id=' + data.id;
             } else if (obj.event === 'del') {
-                layer.confirm('真的删除行么', function (index) {
+                layer.confirm('真的删除该采购需求么', function (index) {
                     deleteByDid(data.id).then(t => {
                         if (t.code == 0) {
                             obj.del();

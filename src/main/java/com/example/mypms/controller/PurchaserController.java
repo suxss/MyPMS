@@ -569,4 +569,20 @@ public class PurchaserController {
             return resultJson;
         }
     }
+
+    @RequestMapping(value = "p/query/info", method = RequestMethod.GET)
+    public ResultJson getBasicInfo(HttpServletRequest request) {
+        ResultJson resultJson = new ResultJson();
+        User user = (User) request.getSession().getAttribute("user");
+        if (user == null) {
+            resultJson.setCode(-1);
+            resultJson.setMsg("请先登录");
+            return resultJson;
+        }
+        BasicInfo basicInfo = purchaserService.getBasicInfo(user.getUid());
+        resultJson.setCode(0);
+        resultJson.setMsg("查询成功");
+        resultJson.setData(basicInfo);
+        return resultJson;
+    }
 }

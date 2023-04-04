@@ -42,4 +42,10 @@ public interface VendorMapper {
     String getPuidByPid(int pid);
 
     int finishProcurement(int pid);
+
+    float getVendorRate(String uid);
+
+    ArrayList<LineChartData> getChartData(String uid);
+
+    int isQuoteBeAgreed(int qid);
 }

@@ -55,4 +55,10 @@ public interface PurchaserMapper {
     String getVuidByPid(int pid);
 
     int finishProcurement(int pid);
+
+    float getPurchaserRate(String uid);
+
+    ArrayList<LineChartData> getChartData(String uid);
+
+    int getAllQuotesCountByUid(String uid);
 }

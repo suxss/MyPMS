@@ -195,4 +195,41 @@
         set status = -1
         where pid = #{pid}
     </update>
+
+    <select id="getPurchaserRate" resultType="float">
+        select rate
+        from purchaser
+        where uid = #{uid}
+        limit 1
+    </select>
+
+    <select id="getChartData" resultType="com.example.mypms.model.LineChartData">
+        select t2.label as `label`, coalesce(counts, 0) as `count`
+        from (select cast(t.start_time as DATE) as label, count(*) as counts
+              from (select * from pd where start_time > date_sub(now(), INTERVAL 7 DAY) and expire_time > now()) as t
+              where t.p_uid = #{uid}
+              group by day(t.start_time)) as t1
+                 right join
+             (select DATE_SUB(curdate(), INTERVAL 0 DAY) label
+              union
+              select DATE_SUB(curdate(), INTERVAL 1 DAY) label
+              union
+              select DATE_SUB(curdate(), INTERVAL 2 DAY) label2
+              union
+              select DATE_SUB(curdate(), INTERVAL 3 DAY) label3
+              union
+              select DATE_SUB(curdate(), INTERVAL 4 DAY) label4
+              union
+              select DATE_SUB(curdate(), INTERVAL 5 DAY) label5
+              union
+              select DATE_SUB(curdate(), INTERVAL 6 DAY) label6) as t2 on t1.label = t2.label
+        order by label
+    </select>
+
+    <select id="getAllQuotesCountByUid" resultType="int">
+        select count(*)
+        from quote
+                 inner join pd p on quote.p_id = p.pdid
+        where p_uid = #{uid}
+    </select>
 </mapper>

@@ -279,4 +279,26 @@ public class PurchaserService {
         return purchaserMapper.updateRate(v_uid, rate);
     }
 
+    public BasicInfo getBasicInfo(String uid) {
+        int demands_count = getDemandsCountByUid(uid);
+        int quotes_count = purchaserMapper.getAllQuotesCountByUid(uid);
+        int processing_count = getProcurementsCountByUid(uid);
+        float current_rate = purchaserMapper.getPurchaserRate(uid);
+        ArrayList<LineChartData> chartData = purchaserMapper.getChartData(uid);
+        BasicInfo basicInfo = new BasicInfo();
+        ArrayList<String> labels = new ArrayList<>();
+        ArrayList<Integer> counts = new ArrayList<>();
+        for (LineChartData chartDataItem :
+                chartData) {
+            labels.add(chartDataItem.getLabel());
+            counts.add(chartDataItem.getCount());
+        }
+        basicInfo.setLabels(labels);
+        basicInfo.setCounts(counts);
+        basicInfo.setDemands_count(demands_count);
+        basicInfo.setQuotes_count(quotes_count);
+        basicInfo.setProcessing_count(processing_count);
+        basicInfo.setCurrent_rate(current_rate);
+        return basicInfo;
+    }
 }

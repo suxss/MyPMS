@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+	<title>查看所有报价-供应商端</title>
+	<link rel="stylesheet" href="../layui/css/layui.css">
+	<script src="../js/jquery.min.js"></script>
+	<script src="../js/main.js"></script>
+</head>
+<body>
+<div class="layui-layout layui-layout-admin">
+	<div class="layui-header">
+		<div class="layui-logo layui-hide-xs layui-bg-black" onclick="window.location.href='index.html'">
+			采购管理系统
+		</div>
+
+		<!-- 头部区域（可配合layui 已有的水平导航） -->
+		<ul class="layui-nav layui-layout-left">
+			<!-- 移动端显示 -->
+			<li class="layui-nav-item layui-show-xs-inline-block layui-hide-sm" lay-header-event="menuLeft">
+				<i class="layui-icon layui-icon-spread-left"></i>
+			</li>
+			<li class="layui-nav-item"> 查看所有报价</li>
+		</ul>
+		<ul class="layui-nav layui-layout-right">
+			<li class="layui-nav-item layui-hide layui-show-md-inline-block">
+				<a href="javascript:;">
+					<img src="../pic/avataaars.png" class="layui-nav-img">
+					<span id="username_label">xxx</span>
+				</a>
+				<dl class="layui-nav-child">
+					<!--                    <dd><a href="">资料</a></dd>-->
+					<!--                    <dd><a href="">设置</a></dd>-->
+					<dd><a href="javascript: main();">注销</a></dd>
+				</dl>
+			</li>
+			<li class="layui-nav-item" lay-header-event="menuRight" lay-unselect>
+				<a href="javascript:;">
+					<i class="layui-icon layui-icon-more-vertical"></i>
+				</a>
+			</li>
+		</ul>
+	</div>
+
+	<div class="layui-side layui-bg-black">
+		<div class="layui-side-scroll">
+			<!-- 左侧导航区域（可配合layui已有的垂直导航） -->
+			<ul class="layui-nav layui-nav-tree" lay-filter="test">
+				<li class="layui-nav-item layui-nav-itemed">
+
+					<a class="" href="javascript:;">
+						<i class="layui-icon layui-icon-cart"></i>
+						<span>采购需求管理</span>
+					</a>
+					<dl class="layui-nav-child">
+						<dd>
+							<a href="demands.html">
+								<i class="layui-icon layui-icon-form"></i>
+								查看采购需求
+							</a>
+						</dd>
+						<dd class="menu-dd layui-this">
+							<a href="quotes.html">
+								<i class="layui-icon layui-icon-form"></i>
+								查看所有报价
+							</a>
+						</dd>
+					</dl>
+				</li>
+				<li class="layui-nav-item layui-nav-itemed">
+					<a class="" href="javascript:;">
+						<i class="layui-icon layui-icon-util"></i>
+						<span>采购流程管理</span>
+					</a>
+					<dl class="layui-nav-child">
+						<dd>
+							<a href="purchases.html">
+								<i class="layui-icon layui-icon-date"></i>
+								查看采购流程
+							</a>
+						</dd>
+					</dl>
+				</li>
+			</ul>
+		</div>
+	</div>
+
+	<div class="layui-body">
+		<!-- 内容主体区域 -->
+		<div style="padding: 15px;">
+
+			<div class="layui-panel">
+				<table id="demo" lay-filter="demo"></table>
+			</div>
+		</div>
+	</div>
+
+	<div class="layui-footer">
+		<!-- 底部固定区域 -->
+		<!-- 底部固定区域 -->
+	</div>
+</div>
+<script src="../layui/layui.js"></script>
+<script type="text/html" id="barDemo">
+	<a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="delete">删除报价</a>
+</script>
+<script>
+    const query_quotes_path = "query/quotes"
+        , delete_quote_path = "delete/quote"
+
+    layui.use(['element', 'layer', 'util', 'table'], function () {
+        var element = layui.element
+            , layer = layui.layer
+            , util = layui.util
+            , $ = layui.$;
+
+        //头部事件
+        util.event('lay-header-event', {
+            //左侧菜单事件
+            menuLeft: function (othis) {
+                layer.msg('展开左侧菜单的操作', {icon: 0});
+            }
+            , menuRight: function () {
+                layer.open({
+                    type: 1
+                    , content: '<div style="padding: 15px;">处理右侧面板的操作</div>'
+                    , area: ['260px', '100%']
+                    , offset: 'rt' //右上角
+                    , anim: 5
+                    , shadeClose: true
+                });
+            }
+        });
+
+        var table = layui.table;
+
+        //第一个实例
+        table.render({
+            elem: '#demo'
+            , even: false
+            , title: '采购需求表'
+            , height: 600
+            , toolbar: true
+            , escape: true
+            , limit: 20
+            , url: query_quotes_path //数据接口
+            , page: true //开启分页
+            , request: {
+                pageName: 'curr' //页码的参数名称，默认：page
+                , limitName: 'nums' //每页数据量的参数名，默认：limit
+            } // ?curr=1&nums=30
+            , parseData: function (res) { //res 即为原始返回的数据
+                for (var i = 0; i < res.data.length; i++) {
+                    res.data[i].id = res.data[i].qid;
+                    res.data[i].unit_price = res.data[i].total_price / res.data[i].amount;
+                }
+                return {
+                    "code": res.code, //解析接口状态
+                    "msg": res.msg, //解析提示文本
+                    "count": res.total, //解析数据长度
+                    "data": res.data //解析数据列表
+                };
+            }
+            , cols: [[ //表头
+                {field: 'id', title: '编号', width: 100, sort: true, fixed: 'left'}
+                , {field: 'product_name', title: '产品名', width: 120}
+                , {field: 'uname', title: '采购员', width: 120}
+                , {field: 'amount', title: '采购数量', width: 120, sort: true}
+                , {field: 'unit_price', title: '单价', width: 180, sort: true}
+                , {field: 'total_price', title: '总价', width: 180, sort: true}
+                , {field: 'remark', title: '备注'}
+                , {title: '操作', width: 220, fixed: 'right', toolbar: '#barDemo'}
+            ]]
+            , defaultToolbar: ['filter', 'print', 'exports',
+                //     {
+                //     title: '提示' //标题
+                //     , layEvent: 'LAYTABLE_TIPS' //事件名，用于 toolbar 事件中使用
+                //     , icon: 'layui-icon-tips' //图标类名
+                // }
+            ]
+        });
+
+        table.on('tool(demo)', function (obj) {
+            var data = obj.data;
+            if (obj.event === 'delete') {
+                layer.confirm('真的删除该报价么', function (index) {
+                    deleteByQid(data.id).then(t => {
+                        if (t.code == 0) {
+                            obj.del();
+                            layer.close(index);
+                        } else {
+                            layer.msg(t.msg);
+                        }
+                    }).catch(err => {
+                        layer.msg(err);
+                    });
+                });
+            }
+        });
+
+        function deleteByQid(qid) {
+            return new Promise((resolve, reject) => {
+                fetch(delete_quote_path, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        qid: qid
+                    })
+                }).then(res => res.json())
+                    .then(res => {
+                        resolve(res);
+                    }).catch(err => {
+                    reject(err);
+                });
+            });
+        }
+    });
+</script>
+</body>
+</html>
