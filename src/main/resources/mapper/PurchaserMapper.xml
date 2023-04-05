@@ -206,7 +206,17 @@
     <select id="getChartData" resultType="com.example.mypms.model.LineChartData">
         select t2.label as `label`, coalesce(counts, 0) as `count`
         from (select cast(t.start_time as DATE) as label, count(*) as counts
-              from (select * from pd where start_time > date_sub(now(), INTERVAL 7 DAY) and expire_time > now()) as t
+              from (select quote.qid,
+                           quote.p_id,
+                           quote.v_uid,
+                           quote.amount,
+                           quote.total_price,
+                           quote.remark,
+                           quote.start_time,
+                           p.p_uid
+                    from quote
+                             inner join pd p on quote.p_id = p.pdid
+                    where quote.start_time > date_sub(now(), INTERVAL 7 DAY)) as t
               where t.p_uid = #{uid}
               group by day(t.start_time)) as t1
                  right join
