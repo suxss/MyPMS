@@ -42,7 +42,7 @@ public interface PurchaserMapper {
 
     int getStatusByPidAndUid(int pid, String uid);
 
-    int updateContract(int pid, String filename, String path, String expire_time);
+    int updateContract(int pid, String filename, String path, String expire_time, double file_size);
 
     Contract getContractPathAndName(int pid);
 

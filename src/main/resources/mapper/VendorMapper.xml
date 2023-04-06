@@ -115,7 +115,8 @@
         set cname        = #{filename},
             cpath        = #{path},
             cexpire_time = #{expire_time},
-            status       = 3
+            status       = 3,
+            csize        = #{file_size}
         where pid = #{pid}
     </update>
 

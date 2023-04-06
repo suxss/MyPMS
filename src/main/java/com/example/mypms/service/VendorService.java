@@ -151,10 +151,10 @@ public class VendorService {
      * @param newFilename 新文件名
      * @return 1 - 更新成功, 0 - 更新失败
      */
-    public int updateContract(int pid, String filename, String newFilename) {
+    public int updateContract(int pid, String filename, String newFilename, double file_size) {
         String path = FILE_SAVE_PATH + newFilename;
         String expireTime = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date((long) (System.currentTimeMillis() + 1000 * 60 * 60 * 24 * EXPIRE_DAYS)));
-        return vendorMapper.updateContract(pid, filename, path, expireTime);
+        return vendorMapper.updateContract(pid, filename, path, expireTime, file_size);
     }
 
     /**

@@ -106,13 +106,15 @@
     <a class="layui-btn layui-btn-xs layui-btn-xs" lay-event="detail">查看流程</a>
 </script>
 <script>
-    const query_purchases_path = "query/processing";
+    const query_purchases_path = "query/processing"
+            ,
+            status_name = ["采购员上传合同", "供应商上传合同", "采购员确认", "供应商发货", "采购员收货", "采购员评价", "供应商评价"];
 
     layui.use(['element', 'layer', 'util', 'table'], function () {
         var element = layui.element
-            , layer = layui.layer
-            , util = layui.util
-            , $ = layui.$;
+                , layer = layui.layer
+                , util = layui.util
+                , $ = layui.$;
 
         //头部事件
         util.event('lay-header-event', {
@@ -143,7 +145,7 @@
             , toolbar: true
             , escape: true
             , limit: 20
-            , url: query_purchases_path //数据接口 '../testdata/demand.json'
+            , url: query_purchases_path //数据接口
             , page: true //开启分页
             , request: {
                 pageName: 'curr' //页码的参数名称，默认：page
@@ -152,6 +154,7 @@
             , parseData: function (res) { //res 即为原始返回的数据
                 for (var i = 0; i < res.data.length; i++) {
                     res.data[i].id = res.data[i].pid;
+                    res.data[i].status_name = status_name[res.data[i].status - 1];
                     res.data[i].start_time = new Date(res.data[i].start_time).toLocaleString();
                 }
                 return {
@@ -163,7 +166,7 @@
             }
             , cols: [[ //表头
                 {field: 'id', title: '采购编号', width: 100, sort: true, fixed: 'left'}
-                , {field: 'status', title: '当前状态', width: 100, sort: true}
+                , {field: 'status_name', title: '当前状态', width: 100, sort: true}
                 , {field: 'product_name', title: '产品名', width: 120}
                 , {field: 'amount', title: '采购数量', width: 120, sort: true}
                 , {field: 'total_price', title: '总价', width: 120, sort: true}

@@ -44,10 +44,11 @@ public class PurchaserController {
             resultJson.setMsg("请先登录");
             return resultJson;
         }
-        String product_name = (String) demand.get("product_name");
+        String product_name;
         int amount;
         try {
-            amount = parseInt((String) demand.get("amount"));
+            product_name = demand.get("product_name").toString();
+            amount = parseInt(demand.get("amount").toString());
         } catch (NumberFormatException e) {
             logger.error("addDemand >> amount is not a number");
             resultJson.setCode(-1);
@@ -59,9 +60,10 @@ public class PurchaserController {
             resultJson.setMsg("数量不能为空");
             return resultJson;
         }
-        String expire_date = (String) demand.get("expire_date");
+        String expire_date;
         Date expire;
         try {
+            expire_date = demand.get("expire_date").toString();
             expire = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse(expire_date);
         } catch (Exception e) {
             logger.error("addDemand >> expire_date is not a date");
@@ -75,7 +77,12 @@ public class PurchaserController {
             resultJson.setMsg("过期日期必须在今天之后");
             return resultJson;
         }
-        String remark = (String) demand.get("remark");
+        String remark;
+        try {
+            remark = demand.get("remark").toString();
+        } catch (NullPointerException e) {
+            remark = "";
+        }
         logger.info("addDemand >> product_name:" + product_name + ", amount: " + amount + ", expire_date: " + expire_date + ", remark: " + remark);
         int r = purchaserService.addDemand(user.getUid(), product_name, amount, expire_date, remark);
         if (r > 0) {
@@ -94,8 +101,8 @@ public class PurchaserController {
         User user = (User) request.getSession().getAttribute("user");
         int curr, nums;
         try {
-            curr = parseInt((String) params.get("curr"));
-            nums = parseInt((String) params.get("nums"));
+            curr = parseInt(params.get("curr").toString());
+            nums = parseInt(params.get("nums").toString());
         } catch (NumberFormatException e) {
             logger.error("getDemandList >> curr or nums is not a number");
             datasJson.setCode(-1);
@@ -137,9 +144,9 @@ public class PurchaserController {
         User user = (User) request.getSession().getAttribute("user");
         int curr, nums, pdid;
         try {
-            curr = parseInt((String) params.get("curr"));
-            nums = parseInt((String) params.get("nums"));
-            pdid = parseInt((String) params.get("id"));
+            curr = parseInt(params.get("curr").toString());
+            nums = parseInt(params.get("nums").toString());
+            pdid = parseInt(params.get("id").toString());
         } catch (NumberFormatException e) {
             logger.error("getQuoteList >> curr or nums is not a number");
             datasJson.setCode(-1);
@@ -181,8 +188,8 @@ public class PurchaserController {
         User user = (User) request.getSession().getAttribute("user");
         int curr, nums;
         try {
-            curr = parseInt((String) params.get("curr"));
-            nums = parseInt((String) params.get("nums"));
+            curr = parseInt(params.get("curr").toString());
+            nums = parseInt(params.get("nums").toString());
         } catch (NumberFormatException e) {
             logger.error("getProcumentList >> curr or nums is not a number");
             datasJson.setCode(-1);
@@ -240,14 +247,21 @@ public class PurchaserController {
     @RequestMapping(value = "/p/query/v_info", method = RequestMethod.POST)
     public ResultJson getVendorInfo(@RequestBody Map<String, Object> params) {
         ResultJson resultJson = new ResultJson();
-        String v_uid = (String) params.get("vid");
-        if (v_uid == null) {
+        if (params.get("vid") == null) {
             logger.error("getVendorInfo >> v_uid is null");
             resultJson.setCode(-1);
             resultJson.setMsg("参数错误");
             resultJson.setData(new Vendor());
             return resultJson;
         }
+        if (params.get("vid") == null) {
+            logger.error("getVendorInfo >> vid is null");
+            resultJson.setCode(-1);
+            resultJson.setMsg("缺少参数vid");
+            resultJson.setData(new Vendor());
+            return resultJson;
+        }
+        String v_uid = params.get("vid").toString();
         Vendor vendor = purchaserService.getVendorInfoByUid(v_uid);
         if (vendor == null) {
             logger.error("getVendorInfo >> vendor is null");
@@ -268,7 +282,7 @@ public class PurchaserController {
         User user = (User) request.getSession().getAttribute("user");
         int qid;
         try {
-            qid = parseInt((String) params.get("qid"));
+            qid = parseInt(params.get("qid").toString());
         } catch (NumberFormatException e) {
             logger.error("agreeQuote >> qid is not a number");
             resultJson.setCode(-1);
@@ -310,7 +324,7 @@ public class PurchaserController {
         User user = (User) request.getSession().getAttribute("user");
         int pdid;
         try {
-            pdid = parseInt((String) params.get("pdid"));
+            pdid = parseInt(params.get("pdid").toString());
         } catch (NumberFormatException e) {
             logger.error("deleteDemand >> pdid is not a number");
             resultJson.setCode(-1);
@@ -361,6 +375,7 @@ public class PurchaserController {
             return resultJson;
         }
         String newFilename = fileManageService.getNewFileName(file);
+        double fileSize = file.getSize() / 1024.0 / 1024.0;  // MB
         try {
             fileManageService.fileUpload(file.getBytes(), newFilename);
         } catch (IOException e) {
@@ -369,7 +384,7 @@ public class PurchaserController {
             resultJson.setMsg("文件上传出错");
             return resultJson;
         }
-        int r = purchaserService.updateContract(id, file.getOriginalFilename(), newFilename);
+        int r = purchaserService.updateContract(id, file.getOriginalFilename(), newFilename, fileSize);
         if (r > 0) {
             resultJson.setCode(0);
             resultJson.setMsg("上传成功");
@@ -434,7 +449,7 @@ public class PurchaserController {
             return resultJson;
         }
         try {
-            id = parseInt((String) params.get("id"));
+            id = parseInt(params.get("id").toString());
         } catch (NumberFormatException e) {
             resultJson.setCode(-1);
             resultJson.setMsg("id必须为数字");
@@ -469,7 +484,7 @@ public class PurchaserController {
             return resultJson;
         }
         try {
-            id = parseInt((String) params.get("id"));
+            id = parseInt(params.get("id").toString());
         } catch (NumberFormatException e) {
             resultJson.setCode(-1);
             resultJson.setMsg("id必须为数字");
@@ -504,7 +519,7 @@ public class PurchaserController {
             return resultJson;
         }
         try {
-            id = parseInt((String) params.get("id"));
+            id = parseInt(params.get("id").toString());
         } catch (NumberFormatException e) {
             resultJson.setCode(-1);
             resultJson.setMsg("id必须为数字");

@@ -87,7 +87,7 @@ public class VendorController {
         try {
             demand_id = Integer.parseInt(quote.get("demand_id").toString());
             amount = Integer.parseInt(quote.get("amount").toString());
-            total_price = Float.parseFloat((String) quote.get("total_price"));
+            total_price = Float.parseFloat(quote.get("total_price").toString());
         } catch (NumberFormatException e) {
             logger.error("addQuote >> demand_id, amount or total_price is not a number");
             resultJson.setCode(-1);
@@ -99,7 +99,12 @@ public class VendorController {
             resultJson.setMsg("需求编号、数量或总价不能为空");
             return resultJson;
         }
-        String remark = (String) quote.get("remark");
+        String remark;
+        try {
+            remark = quote.get("remark").toString();
+        } catch (NullPointerException e) {
+            remark = "";
+        }
         if (vendorService.addQuote(user.getUid(), demand_id, amount, total_price, remark) > 0) {
             resultJson.setCode(0);
             resultJson.setMsg("添加成功");
@@ -241,14 +246,14 @@ public class VendorController {
     @RequestMapping(value = "/v/query/p_info", method = RequestMethod.POST)
     public ResultJson getPurchaserInfo(@RequestBody Map<String, Object> params) {
         ResultJson resultJson = new ResultJson();
-        String p_uid = (String) params.get("pid");
-        if (p_uid == null) {
+        if (params.get("pid") == null) {
             logger.error("getPurchaserInfo >> p_uid is null");
             resultJson.setCode(-1);
             resultJson.setMsg("采购商编号不能为空");
             resultJson.setData(new Purchaser());
             return resultJson;
         }
+        String p_uid = params.get("pid").toString();
         Purchaser purchaser = vendorService.getPurchaserByUid(p_uid);
         if (purchaser == null) {
             logger.error("getPurchaserInfo >> purchaser is null");
@@ -305,7 +310,10 @@ public class VendorController {
             resultJson.setMsg("当前流程无需上传合同");
             return resultJson;
         }
+        String oldFilename = fileManageService.getContractNameByPid(id);
+        fileManageService.deleteFile(oldFilename);
         String newFilename = fileManageService.getNewFileName(file);
+        double file_size = file.getSize() / 1024.0 / 1024.0;
         try {
             fileManageService.fileUpload(file.getBytes(), newFilename);
         } catch (IOException e) {
@@ -314,7 +322,7 @@ public class VendorController {
             resultJson.setMsg("文件上传出错");
             return resultJson;
         }
-        int r = vendorService.updateContract(id, file.getOriginalFilename(), newFilename);
+        int r = vendorService.updateContract(id, file.getOriginalFilename(), newFilename, file_size);
         if (r > 0) {
             resultJson.setCode(0);
             resultJson.setMsg("上传成功");
@@ -351,7 +359,7 @@ public class VendorController {
             return resultJson;
         }
         try {
-            id = Integer.parseInt((String) params.get("id"));
+            id = Integer.parseInt(params.get("id").toString());
         } catch (NumberFormatException e) {
             resultJson.setCode(-1);
             resultJson.setMsg("id必须为数字");
@@ -386,7 +394,7 @@ public class VendorController {
             return resultJson;
         }
         try {
-            id = Integer.parseInt((String) params.get("id"));
+            id = Integer.parseInt(params.get("id").toString());
         } catch (NumberFormatException e) {
             resultJson.setCode(-1);
             resultJson.setMsg("id必须为数字");
@@ -433,6 +441,8 @@ public class VendorController {
             resultJson.setMsg("id, rate 不能为空");
             return resultJson;
         }
+        String oldFilename = fileManageService.getContractNameByPid(id);
+        fileManageService.deleteFile(oldFilename);
         if (vendorService.getStatus(id, user.getUid()) != 7) {
             resultJson.setCode(-1);
             resultJson.setMsg("当前流程无需评价");

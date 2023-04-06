@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.mypms.mapper.FileManageMapper">
+    <select id="getContractNameByPid" resultType="java.lang.String">
+        select cname
+        from procurement
+        where pid = #{pid}
+        limit 1
+    </select>
+    <select id="getExpireContractPid" resultType="int">
+        select pid
+        from procurement
+        where procurement.cexpire_time <![CDATA[<=]]> now()
+          and status <![CDATA[<=]]> 3
+    </select>
+
+    <update id="resetStatusByPid" parameterType="int">
+        update procurement
+        set status = 1
+        where pid = #{pid}
+    </update>
+</mapper>
