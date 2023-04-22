@@ -48,4 +48,10 @@ public interface VendorMapper {
     ArrayList<LineChartData> getChartData(String uid);
 
     int isQuoteBeAgreed(int qid);
+
+    StatusCount getStatusCount(String v_uid);
+
+    ArrayList<Procurement> getNeedActionProcurement(String v_uid);
+
+    ArrayList<ProcurementDemand> getLatestDemands();
 }

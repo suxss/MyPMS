@@ -11,9 +11,10 @@
 <body>
 <div class="layui-layout layui-layout-admin">
     <div class="layui-header">
-        <div class="layui-logo layui-hide-xs layui-bg-black" onclick="window.location.href='index.html'">
-			采购管理系统
-		</div>
+        <div class="layui-logo layui-hide-xs layui-bg-black" onclick="window.location.href='index.html'"
+             style="cursor:pointer">
+            采购管理系统
+        </div>
 
         <!-- 头部区域（可配合layui 已有的水平导航） -->
         <ul class="layui-nav layui-layout-left">
@@ -32,7 +33,7 @@
 				<dl class="layui-nav-child">
 					<!--                    <dd><a href="">资料</a></dd>-->
 					<!--                    <dd><a href="">设置</a></dd>-->
-					<dd><a href="javascript: main();">注销</a></dd>
+                    <dd><a href="javascript: logout();">注销</a></dd>
 				</dl>
             </li>
             <li class="layui-nav-item" lay-header-event="menuRight" lay-unselect>

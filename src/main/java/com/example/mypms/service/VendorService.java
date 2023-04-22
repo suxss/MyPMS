@@ -227,4 +227,16 @@ public class VendorService {
         int r = vendorMapper.isQuoteBeAgreed(qid);
         return r > 0;
     }
+
+    public StatusCount getStatusCount(String v_uid) {
+        return vendorMapper.getStatusCount(v_uid);
+    }
+
+    public ArrayList<Procurement> getNeedActionProcurement(String v_uid) {
+        return vendorMapper.getNeedActionProcurement(v_uid);
+    }
+
+    public ArrayList<ProcurementDemand> getLatestDemands() {
+        return vendorMapper.getLatestDemands();
+    }
 }

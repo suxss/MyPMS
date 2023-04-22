@@ -196,4 +196,54 @@
               select DATE_SUB(curdate(), INTERVAL 6 DAY) label6) as t2 on t1.label = t2.label
         order by label
     </select>
+
+    <select id="getStatusCount" resultType="com.example.mypms.model.StatusCount">
+        select sum(if(status = 1, 1, 0))                          as `one`,
+               sum(if(status = 2, 1, 0))                          as `two`,
+               sum(if(status = 3, 1, 0))                          as `three`,
+               sum(if(status = 4, 1, 0))                          as `four`,
+               sum(if(status = 5, 1, 0))                          as `five`,
+               sum(if(status = 6, 1, 0))                          as `six`,
+               sum(if(status = 7, 1, 0))                          as `seven`,
+               sum(if(status > 7 or 1 > processing.status, 1, 0)) as `finished`
+        from processing
+        where v_uid = #{v_uid}
+    </select>
+
+    <select id="getNeedActionProcurement" resultType="com.example.mypms.model.Procurement">
+        select pid,
+               qid,
+               pdid,
+               status,
+               start_time,
+               p_uid,
+               p_name,
+               product_name,
+               amount,
+               total_price,
+               cname,
+               cpath,
+               cexpire_time,
+               remark
+        from processing
+        where v_uid = #{v_uid}
+          and status in (2, 4, 7)
+        limit 6
+    </select>
+
+    <select id="getLatestDemands" resultType="com.example.mypms.model.ProcurementDemand">
+        select pdid,
+               product_name,
+               amount,
+               expire_time,
+               start_time,
+               remark,
+               uid as p_uid,
+               uname
+        from pd
+                 inner join purchaser p on pd.p_uid = p.uid
+        where expire_time > now()
+        order by start_time DESC
+        limit 6
+    </select>
 </mapper>

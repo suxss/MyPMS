@@ -301,4 +301,16 @@ public class PurchaserService {
         basicInfo.setCurrent_rate(current_rate);
         return basicInfo;
     }
+
+    public StatusCount getStatusCount(String v_uid) {
+        return purchaserMapper.getStatusCount(v_uid);
+    }
+
+    public ArrayList<Procurement> getNeedActionProcurement(String p_uid) {
+        return purchaserMapper.getNeedActionProcurement(p_uid);
+    }
+
+    public ArrayList<ProcurementDemand> getLatestQuotesByPid(String p_uid) {
+        return purchaserMapper.getLatestQuotesByPid(p_uid);
+    }
 }

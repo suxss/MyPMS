@@ -477,4 +477,44 @@ public class VendorController {
         resultJson.setData(basicInfo);
         return resultJson;
     }
+
+    @RequestMapping(value = "/v/query/status_count", method = RequestMethod.GET)
+    public ResultJson getStatusCount(HttpServletRequest request) {
+        ResultJson resultJson = new ResultJson();
+        User user = (User) request.getSession().getAttribute("user");
+        if (user == null) {
+            resultJson.setCode(-1);
+            resultJson.setMsg("请先登录");
+            return resultJson;
+        }
+        StatusCount statusCount = vendorService.getStatusCount(user.getUid());
+        resultJson.setCode(0);
+        resultJson.setMsg("查询成功");
+        resultJson.setData(statusCount);
+        return resultJson;
+    }
+
+    @RequestMapping(value = "/v/query/need_action", method = RequestMethod.GET)
+    public ResultJson getNeedActionProcurement(HttpServletRequest request) {
+        ResultJson resultJson = new ResultJson();
+        User user = (User) request.getSession().getAttribute("user");
+        if (user == null) {
+            resultJson.setData(-1);
+            resultJson.setMsg("请先登录");
+            return resultJson;
+        }
+        resultJson.setCode(0);
+        resultJson.setMsg("查询成功");
+        resultJson.setData(vendorService.getNeedActionProcurement(user.getUid()));
+        return resultJson;
+    }
+
+    @RequestMapping(value = "/v/query/latest_demands", method = RequestMethod.GET)
+    public ResultJson getLatestDemands() {
+        ResultJson resultJson = new ResultJson();
+        resultJson.setCode(0);
+        resultJson.setMsg("查询成功");
+        resultJson.setData(vendorService.getLatestDemands());
+        return resultJson;
+    }
 }

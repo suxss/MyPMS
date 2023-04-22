@@ -10,14 +10,35 @@
     <script src="../js/main.js"></script>
     <style>
         .layui-rate {
-            padding: 0px 5px 0px 0px;
+            padding: 3px 5px;
+        }
+
+        .notice_item {
+            cursor: pointer;
+            padding: 7px 16px;
+        }
+
+        .notice_item:hover {
+            background: #f6f6f6;
+        }
+
+        .notice_item_content_right {
+            position: absolute;
+            right: 16px;
+            color: #999;
+        }
+
+        .statistics_number {
+            font-size: 200%;
+            color: #ffb800
         }
     </style>
 </head>
 <body>
 <div class="layui-layout layui-layout-admin">
     <div class="layui-header">
-        <div class="layui-logo layui-hide-xs layui-bg-black" onclick="window.location.href='index.html'">
+        <div class="layui-logo layui-hide-xs layui-bg-black" onclick="window.location.href='index.html'"
+             style="cursor:pointer">
             采购管理系统
         </div>
 
@@ -27,7 +48,7 @@
             <li class="layui-nav-item layui-show-xs-inline-block layui-hide-sm" lay-header-event="menuLeft">
                 <i class="layui-icon layui-icon-spread-left"></i>
             </li>
-            <li class="layui-nav-item"> 添加采购需求</li>
+            <li class="layui-nav-item"> 数据统计</li>
         </ul>
         <ul class="layui-nav layui-layout-right">
             <li class="layui-nav-item layui-hide layui-show-md-inline-block">
@@ -38,7 +59,7 @@
 				<dl class="layui-nav-child">
 					<!--                    <dd><a href="">资料</a></dd>-->
 					<!--                    <dd><a href="">设置</a></dd>-->
-					<dd><a href="javascript: main();">注销</a></dd>
+                    <dd><a href="javascript: logout();">注销</a></dd>
 				</dl>
             </li>
             <li class="layui-nav-item" lay-header-event="menuRight" lay-unselect>
@@ -99,47 +120,100 @@
             <!--                <div class="layui-bg-gray" style="padding: 30px;">-->
             <div class="layui-row layui-col-space15">
                 <div class="layui-col-md6">
-                    <div class="layui-card">
-                        <div class="layui-card-header">现有采购需求</div>
-                        <div class="layui-card-body">
-                            <span id="demands_count">*********</span>
+                    <div class="layui-row layui-col-space15">
+                        <div class="layui-col-md6">
+                            <div class="layui-card">
+                                <div class="layui-card-header">现有采购需求</div>
+                                <div class="layui-card-body">
+                                    <span class="statistics_number" id="demands_count">*********</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="layui-col-md6">
+                            <div class="layui-card">
+                                <div class="layui-card-header">报价</div>
+                                <div class="layui-card-body">
+                                    <span class="statistics_number" id="quotes_count">*********</span>
+                                </div>
+                            </div>
                         </div>
                     </div>
-                </div>
-                <div class="layui-col-md6">
-                    <div class="layui-card">
-                        <div class="layui-card-header">报价</div>
-                        <div class="layui-card-body">
-                            <span id="quotes_count">*********</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
 
-            <div class="layui-row layui-col-space15">
-                <div class="layui-col-md6">
-                    <div class="layui-card">
-                        <div class="layui-card-header">进行中的采购</div>
-                        <div class="layui-card-body">
-                            <span id="processing_count">0</span>
+                    <div class="layui-row layui-col-space15">
+                        <div class="layui-col-md6">
+                            <div class="layui-card">
+                                <div class="layui-card-header">进行中的采购</div>
+                                <div class="layui-card-body">
+                                    <span class="statistics_number" id="processing_count">0</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="layui-col-md6">
+                            <div class="layui-card">
+                                <div class="layui-card-header">当前评分</div>
+                                <div class="layui-card-body">
+                                    <div id="rate"></div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
-                <div class="layui-col-md6">
-                    <div class="layui-card">
-                        <div class="layui-card-header">当前评分</div>
+                <div class="layui-col-md3" style="height: 215px;">
+                    <div class="layui-card" style="height: 100%">
+                        <div class="layui-card-header">需要操作的采购</div>
                         <div class="layui-card-body">
-                            <div id="rate"></div>
+                            <ul class="list-group" id="need_action_list">
+                                <div class="notice_item" onclick="location.href='/v/process.html?id=6'">
+                                    <span class="notice_item_content_left"> 产品A </span>
+                                    <span class="notice_item_content_right"> 确认发货 </span>
+                                </div>
+                                <div class="notice_item" onclick="location.href='/v/process.html?id=6'">
+                                    <span class="notice_item_content_left"> 产品A </span>
+                                    <span class="notice_item_content_right"> 确认发货 </span>
+                                </div>
+                                <div class="notice_item" onclick="location.href='/v/process.html?id=6'">
+                                    <span class="notice_item_content_left"> 产品A </span>
+                                    <span class="notice_item_content_right"> 确认发货 </span>
+                                </div>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                <div class="layui-col-md3" style="height: 215px;">
+                    <div class="layui-card" style="height: 100%">
+                        <div class="layui-card-header">最新报价</div>
+                        <div class="layui-card-body">
+                            <ul class="list-group" id="latest_quotes_list">
+                                <div class="notice_item" onclick="location.href='/v/process.html?id=6'">
+                                    <span class="notice_item_content_left"> 产品A </span>
+                                    <span class="notice_item_content_right"> 确认发货 </span>
+                                </div>
+                                <div class="notice_item" onclick="location.href='/v/process.html?id=6'">
+                                    <span class="notice_item_content_left"> 产品A </span>
+                                    <span class="notice_item_content_right"> 确认发货 </span>
+                                </div>
+                                <div class="notice_item" onclick="location.href='/v/process.html?id=6'">
+                                    <span class="notice_item_content_left"> 产品A </span>
+                                    <span class="notice_item_content_right"> 确认发货 </span>
+                                </div>
+                            </ul>
                         </div>
                     </div>
                 </div>
             </div>
 
             <div class="layui-row layui-col-space25">
-                <div class="layui-col-md12">
+                <div class="layui-col-md8">
                     <div class="layui-card">
                         <div class="layui-row layui-col-space15">
                             <div id="main" style="height:400px;"></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="layui-col-md4">
+                    <div class="layui-card">
+                        <div class="layui-row layui-col-space15">
+                            <div id="pie" style="height:400px;"></div>
                         </div>
                     </div>
                 </div>
@@ -160,11 +234,87 @@
     <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del">删除需求</a>
 </script>
 <script>
-    const query_path = "query/info";
+    const query_path = "query/info"
+            , query_pie_info_path = "query/status_count"
+            , query_needaction_info_path = "query/need_action"
+            , query_latest_quotes_path = "query/latest_quotes";
+
+    let pie_option = option = {
+        title: {
+            show: true,
+            text: '采购状态统计',
+            left: 'center',
+            top: 'bottom'
+        },
+        tooltip: {
+            trigger: 'item'
+        },
+        series: [
+            {
+                name: '当前进度',
+                type: 'pie',
+                radius: ['40%', '70%'],
+                avoidLabelOverlap: false,
+                itemStyle: {
+                    borderRadius: 10,
+                    borderColor: '#fff',
+                    borderWidth: 2
+                },
+                label: {
+                    show: false,
+                    position: 'center'
+                },
+                emphasis: {
+                    label: {
+                        show: false,
+                        fontSize: 40,
+                        fontWeight: 'bold'
+                    }
+                },
+                labelLine: {
+                    show: true
+                },
+                data: [
+                    {value: 0, name: '采购员上传合同'},
+                    {value: 0, name: '签署合同'},
+                    {value: 0, name: '采购员确认合同'},
+                    {value: 0, name: '确认发货'},
+                    {value: 0, name: '采购员确认收货'},
+                    {value: 0, name: '互相评价'},
+                    {value: 0, name: '已完成'}
+                ]
+            }
+        ]
+    };
 
     function getInfo() {
         return new Promise((resolve, reject) => {
             fetch(query_path, {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            }).then(res => {
+                if (res.ok) {
+                    return res.json();
+                } else {
+                    throw new Error('网络异常');
+                }
+            }).then(res => {
+                if (res.code === 0) {
+                    resolve(res.data);
+                } else {
+                    reject(res.msg);
+                }
+            }).catch(err => {
+                reject(err);
+            });
+        });
+    }
+
+    function getPieInfo() {
+        return new Promise((resolve, reject) => {
+            fetch(query_pie_info_path, {
                 method: 'GET',
                 headers: {
                     'Content-Type': 'application/json'
@@ -196,6 +346,9 @@
 
     var myChart = echarts.init(document.getElementById('main'));
     myChart.showLoading();
+
+    var myPieChart = echarts.init(document.getElementById('pie'));
+    myPieChart.showLoading();
 
     getInfo().then(data => {
         demands_count = data.demands_count;
@@ -244,12 +397,12 @@
                 },
                 toolbox: {
                     show: true,
-                    feature: {
-                        dataView: {show: true, readOnly: false},
-                        magicType: {show: true, type: ['line', 'bar']},
-                        restore: {show: true},
-                        saveAsImage: {show: true}
-                    }
+                    // feature: {
+                    //     dataView: {show: true, readOnly: false},
+                    //     magicType: {show: true, type: ['line', 'bar']},
+                    //     restore: {show: true},
+                    //     saveAsImage: {show: true}
+                    // }
                 },
                 xAxis: {
                     type: 'category',
@@ -292,12 +445,131 @@
                     });
                 }
             });
+
+
         });
 
     });
 
+    getPieInfo().then(data => {
+        var labels = ["one", "two", "three", "four", "five", "six", "seven", "finished"]
+        for (let i = 0; i < 5; i++) {
+            pie_option.series[0].data[i].value = data[labels[i]];
+        }
+        pie_option.series[0].data[5].value = data["six"] + data["seven"];
+        pie_option.series[0].data[6].value = data["finished"];
+        myPieChart.setOption(pie_option);
+        myPieChart.hideLoading();
+    });
+
+    getNeedActionProcessing();
+    getLatestQuotes();
 
 
+    function data2str(data) {
+        var labels = ['上传合同', '签署合同', '确认合同', '确认发货', '确认收货', '互相评价', '已完成']
+        var str_arr1 = [], str_arr2 = [], url_arr = [];
+        for (let i = 0; i < 2 && i < data.data.length; i++) {
+            str_arr1.push(data.data[i].product_name);
+            str_arr2.push(labels[data.data[i].status - 1]);
+            url_arr.push("process.html?id=" + data.data[i].pid.toString());
+        }
+        if (data.data.length > 2) {
+            str_arr1.push("...");
+            str_arr2.push("...");
+            url_arr.push("purchases.html")
+        }
+        if (str_arr1.length == 0) {
+            str_arr1.push("无");
+            str_arr2.push(" ");
+            url_arr.push("purchases.html")
+        }
+        return {
+            "str1": str_arr1,
+            "str2": str_arr2,
+            "url": url_arr
+        }
+    }
+
+    function getNeedActionProcessing() {
+        return new Promise((resolve, reject) => {
+            fetch(query_needaction_info_path, {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            }).then(res => {
+                if (res.ok) {
+                    return res.json();
+                } else {
+                    throw new Error('网络异常');
+                }
+            }).then(data => {
+                var convert_data = data2str(data);
+                console.log(convert_data);
+                var html = "";
+                for (let i = 0; i < convert_data.str1.length; i++) {
+                    html += "<div class=\"notice_item\" onClick=\"location.href='" + convert_data.url[i] + "'\">";
+                    html += "<span class=\"notice_item_content_left\"> " + convert_data.str1[i] + " </span>";
+                    html += "<span class=\"notice_item_content_right\"> " + convert_data.str2[i] + " </span>";
+                    html += "</div>"
+                }
+                $("#need_action_list").html(html);
+            })
+        })
+    }
+
+    function getLastQuotesStr(data) {
+        var str_arr1 = [], str_arr2 = [], url_arr = [];
+        for (let i = 0; i < 2 && i < data.data.length; i++) {
+            str_arr1.push(data.data[i].product_name);
+            str_arr2.push(data.data[i].uname);
+            url_arr.push("demands.html");
+        }
+        if (data.data.length > 2) {
+            str_arr1.push("...");
+            str_arr2.push("...");
+            url_arr.push("demands.html");
+        }
+        if (str_arr1.length == 0) {
+            str_arr1.push("无");
+            str_arr2.push(" ");
+            url_arr.push("demands.html")
+        }
+        return {
+            "str1": str_arr1,
+            "str2": str_arr2,
+            "url": url_arr
+        }
+    }
+
+    function getLatestQuotes() {
+        return new Promise((resolve, reject) => {
+            fetch(query_latest_quotes_path, {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            }).then(res => {
+                if (res.ok) {
+                    return res.json();
+                } else {
+                    throw new Error('网络异常');
+                }
+            }).then(data => {
+                var convert_data = getLastQuotesStr(data);
+                console.log(convert_data);
+                var html = "";
+                for (let i = 0; i < convert_data.str1.length; i++) {
+                    html += "<div class=\"notice_item\" onClick=\"location.href='" + convert_data.url[i] + "'\">";
+                    html += "<span class=\"notice_item_content_left\"> " + convert_data.str1[i] + " </span>";
+                    html += "<span class=\"notice_item_content_right\"> " + convert_data.str2[i] + " </span>";
+                    html += "</div>"
+                }
+                $("#latest_quotes_list").html(html);
+            })
+        })
+    }
 
 </script>
 </body>

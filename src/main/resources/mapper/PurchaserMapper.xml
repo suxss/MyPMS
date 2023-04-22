@@ -41,10 +41,13 @@
     </delete>
 
     <select id="getQuotesByPdid" resultType="com.example.mypms.model.Quote">
-        select qid, p_id, v_uid, uname, amount, total_price, remark
-        from quote
-                 inner join vendor v on quote.v_uid = v.uid
+        select qid, p_id, v_uid, uname, t.amount as amount, total_price, t.remark as remark
+        from (select *
+              from quote
+                       inner join vendor v on quote.v_uid = v.uid) as t
+                 inner join pd on pd.pdid = t.p_id
         where p_id = #{pdid}
+          and pd.expire_time > now()
         limit #{size} offset #{offset}
     </select>
 
@@ -239,8 +242,81 @@
 
     <select id="getAllQuotesCountByUid" resultType="int">
         select count(*)
-        from quote
-                 inner join pd p on quote.p_id = p.pdid
-        where p_uid = #{uid}
+        from (select quote.qid,
+                     p_id,
+                     quote.v_uid,
+                     quote.amount,
+                     quote.total_price,
+                     quote.remark,
+                     quote.start_time,
+                     pdid,
+                     p_uid,
+                     product_name,
+                     expire_time
+              from quote
+                       inner join pd p on quote.p_id = p.pdid) as t
+                 inner join pd on pd.pdid = t.p_id
+        where t.p_uid = #{uid}
+          and pd.expire_time > now()
+    </select>
+
+    <select id="getStatusCount" resultType="com.example.mypms.model.StatusCount">
+        select sum(if(status = 1, 1, 0))                          as `one`,
+               sum(if(status = 2, 1, 0))                          as `two`,
+               sum(if(status = 3, 1, 0))                          as `three`,
+               sum(if(status = 4, 1, 0))                          as `four`,
+               sum(if(status = 5, 1, 0))                          as `five`,
+               sum(if(status = 6, 1, 0))                          as `six`,
+               sum(if(status = 7, 1, 0))                          as `seven`,
+               sum(if(status > 7 or 1 > processing.status, 1, 0)) as `finished`
+        from processing
+        where p_uid = #{p_uid}
+    </select>
+
+    <select id="getNeedActionProcurement" resultType="com.example.mypms.model.Procurement">
+        select pid,
+               qid,
+               pdid,
+               status,
+               start_time,
+               p_uid,
+               p_name,
+               product_name,
+               amount,
+               total_price,
+               cname,
+               cpath,
+               cexpire_time,
+               remark
+        from processing
+        where v_uid = #{v_uid}
+          and status in (1, 3, 5, 6)
+        limit 6
+    </select>
+
+    <select id="getLatestQuotesByPid" resultType="com.example.mypms.model.ProcurementDemand">
+        select qid             as pdid,
+               pd.product_name as product_name,
+               t.amount        as amount,
+               expire_time,
+               start_time,
+               t.remark        as remark,
+               pd.p_uid        as p_uid,
+               v_uname         as uname
+        from (select qid,
+                     p_id,
+                     v_uid,
+                     uname,
+                     amount,
+                     total_price,
+                     remark,
+                     v.uname as v_uname
+              from quote
+                       inner join vendor v on quote.v_uid = v.uid) as t
+                 inner join pd on pdid = t.p_id
+        where pd.p_uid = #{p_uid}
+          and pd.expire_time > now()
+        order by start_time DESC
+        limit 6
     </select>
 </mapper>

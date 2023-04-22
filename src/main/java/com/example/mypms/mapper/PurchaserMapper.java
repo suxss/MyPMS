@@ -61,4 +61,10 @@ public interface PurchaserMapper {
     ArrayList<LineChartData> getChartData(String uid);
 
     int getAllQuotesCountByUid(String uid);
+
+    StatusCount getStatusCount(String p_uid);
+
+    ArrayList<Procurement> getNeedActionProcurement(String p_uid);
+
+    ArrayList<ProcurementDemand> getLatestQuotesByPid(String p_uid);
 }

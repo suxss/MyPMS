@@ -2,7 +2,7 @@
 <!DOCTYPE mapper
         PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.example.mypms.mapper.FileManageMapper">
+<mapper namespace="com.example.mypms.mapper.FileMangeMapper">
     <select id="getContractNameByPid" resultType="java.lang.String">
         select cname
         from procurement
