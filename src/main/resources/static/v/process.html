@@ -53,7 +53,7 @@
 
                     <a class="" href="javascript:;">
                         <i class="layui-icon layui-icon-cart"></i>
-                        <span>采购需求管理</span>
+                        <span>采购报价管理</span>
                     </a>
                     <dl class="layui-nav-child">
                         <dd>
@@ -443,7 +443,7 @@
                     headers: {
                         'Content-Type': 'application/json'
                     },
-                    data: JSON.stringify({
+                    body: JSON.stringify({
                         id: id
                     })
                 }).then(res => res.json())

@@ -2,6 +2,8 @@ package com.example.mypms.controller;
 
 import com.example.mypms.model.*;
 import com.example.mypms.service.FileManageService;
+import com.example.mypms.service.MailService;
+import com.example.mypms.service.UserService;
 import com.example.mypms.service.VendorService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,50 +28,54 @@ public class VendorController {
     @Autowired
     VendorService vendorService;
     @Autowired
+    UserService userService;
+    @Autowired
+    MailService mailService;
+    @Autowired
     FileManageService fileManageService;
 
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
     @RequestMapping(value = "/v/query/demands", method = RequestMethod.GET)
-    public DatasJson getAllDemands(HttpServletRequest request, @RequestParam Map<String, Object> params) {
-        DatasJson datasJson = new DatasJson();
+    public DataJson getAllDemands(HttpServletRequest request, @RequestParam Map<String, Object> params) {
+        DataJson dataJson = new DataJson();
         User user = (User) request.getSession().getAttribute("user");
         int curr, nums;
         if (user == null) {
             logger.error("getAllDemands >> user is null");
-            datasJson.setCode(-1);
-            datasJson.setMsg("请先登录");
-            datasJson.setTotal(0);
-            datasJson.setData(new ArrayList<>());
-            return datasJson;
+            dataJson.setCode(-1);
+            dataJson.setMsg("请先登录");
+            dataJson.setTotal(0);
+            dataJson.setData(new ArrayList<>());
+            return dataJson;
         }
         try {
             curr = Integer.parseInt(params.get("curr").toString());
             nums = Integer.parseInt(params.get("nums").toString());
         } catch (NumberFormatException e) {
             logger.error("getAllDemands >> curr or nums is not a number");
-            datasJson.setCode(-1);
-            datasJson.setMsg("页码或数量必须为数字");
-            datasJson.setTotal(0);
-            datasJson.setData(new ArrayList<>());
-            return datasJson;
+            dataJson.setCode(-1);
+            dataJson.setMsg("页码或数量必须为数字");
+            dataJson.setTotal(0);
+            dataJson.setData(new ArrayList<>());
+            return dataJson;
         } catch (NullPointerException e) {
             logger.error("getAllDemands >> curr or nums is null");
-            datasJson.setCode(-1);
-            datasJson.setMsg("页码或数量不能为空");
-            datasJson.setTotal(0);
-            datasJson.setData(new ArrayList<>());
-            return datasJson;
+            dataJson.setCode(-1);
+            dataJson.setMsg("页码或数量不能为空");
+            dataJson.setTotal(0);
+            dataJson.setData(new ArrayList<>());
+            return dataJson;
         }
-        datasJson.setCode(0);
-        datasJson.setMsg("查询成功");
-        datasJson.setTotal(vendorService.getAllDemandsCount());
+        dataJson.setCode(0);
+        dataJson.setMsg("查询成功");
+        dataJson.setTotal(vendorService.getAllDemandsCount());
         ArrayList<ProcurementDemand> demands = vendorService.getAllDemands(curr, nums);
         if (demands == null) {
             demands = new ArrayList<>();
         }
-        datasJson.setData(demands);
-        return datasJson;
+        dataJson.setData(demands);
+        return dataJson;
     }
 
     @RequestMapping(value = "/v/add/quote", method = RequestMethod.POST)
@@ -116,43 +122,43 @@ public class VendorController {
     }
 
     @RequestMapping(value = "/v/query/quotes", method = RequestMethod.GET)
-    public DatasJson getAllQuotes(HttpServletRequest request, @RequestParam Map<String, Object> params) {
-        DatasJson datasJson = new DatasJson();
+    public DataJson getAllQuotes(HttpServletRequest request, @RequestParam Map<String, Object> params) {
+        DataJson dataJson = new DataJson();
         User user = (User) request.getSession().getAttribute("user");
         int curr, nums;
         if (user == null) {
             logger.error("getAllQuotes >> user is null");
-            datasJson.setCode(-1);
-            datasJson.setMsg("请先登录");
-            return datasJson;
+            dataJson.setCode(-1);
+            dataJson.setMsg("请先登录");
+            return dataJson;
         }
         try {
             curr = Integer.parseInt(params.get("curr").toString());
             nums = Integer.parseInt(params.get("nums").toString());
         } catch (NumberFormatException e) {
             logger.error("getAllQuotes >> curr or nums is not a number");
-            datasJson.setCode(-1);
-            datasJson.setMsg("页码或数量必须为数字");
-            datasJson.setTotal(0);
-            datasJson.setData(new ArrayList<>());
-            return datasJson;
+            dataJson.setCode(-1);
+            dataJson.setMsg("页码或数量必须为数字");
+            dataJson.setTotal(0);
+            dataJson.setData(new ArrayList<>());
+            return dataJson;
         } catch (NullPointerException e) {
             logger.error("getAllQuotes >> curr or nums is null");
-            datasJson.setCode(-1);
-            datasJson.setMsg("页码或数量不能为空");
-            datasJson.setTotal(0);
-            datasJson.setData(new ArrayList<>());
-            return datasJson;
+            dataJson.setCode(-1);
+            dataJson.setMsg("页码或数量不能为空");
+            dataJson.setTotal(0);
+            dataJson.setData(new ArrayList<>());
+            return dataJson;
         }
-        datasJson.setCode(0);
-        datasJson.setMsg("查询成功");
-        datasJson.setTotal(vendorService.getQuotesCountByUid(user.getUid()));
+        dataJson.setCode(0);
+        dataJson.setMsg("查询成功");
+        dataJson.setTotal(vendorService.getQuotesCountByUid(user.getUid()));
         ArrayList<Quote> quotes = vendorService.getQuotesByUid(user.getUid(), curr, nums);
         if (quotes == null) {
             quotes = new ArrayList<>();
         }
-        datasJson.setData(quotes);
-        return datasJson;
+        dataJson.setData(quotes);
+        return dataJson;
     }
 
     @RequestMapping(value = "/v/delete/quote", method = RequestMethod.POST)
@@ -190,38 +196,38 @@ public class VendorController {
     }
 
     @RequestMapping(value = "/v/query/processing", method = RequestMethod.GET)
-    public DatasJson getProcurements(HttpServletRequest request, @RequestParam Map<String, Object> params) {
-        DatasJson datasJson = new DatasJson();
+    public DataJson getProcurements(HttpServletRequest request, @RequestParam Map<String, Object> params) {
+        DataJson dataJson = new DataJson();
         User user = (User) request.getSession().getAttribute("user");
         int curr, nums;
         if (user == null) {
             logger.error("getProcurement >> user is null");
-            datasJson.setCode(-1);
-            datasJson.setMsg("请先登录");
-            datasJson.setTotal(0);
-            datasJson.setData(new ArrayList<>());
-            return datasJson;
+            dataJson.setCode(-1);
+            dataJson.setMsg("请先登录");
+            dataJson.setTotal(0);
+            dataJson.setData(new ArrayList<>());
+            return dataJson;
         }
         try {
             curr = Integer.parseInt(params.get("curr").toString());
             nums = Integer.parseInt(params.get("nums").toString());
         } catch (NumberFormatException e) {
             logger.error("getProcurement >> curr or nums is not a number");
-            datasJson.setCode(-1);
-            datasJson.setMsg("页码或数量必须为数字");
-            datasJson.setTotal(0);
-            datasJson.setData(new ArrayList<>());
-            return datasJson;
+            dataJson.setCode(-1);
+            dataJson.setMsg("页码或数量必须为数字");
+            dataJson.setTotal(0);
+            dataJson.setData(new ArrayList<>());
+            return dataJson;
         }
-        datasJson.setCode(0);
-        datasJson.setMsg("查询成功");
-        datasJson.setTotal(vendorService.getProcurementsCountByUid(user.getUid()));
+        dataJson.setCode(0);
+        dataJson.setMsg("查询成功");
+        dataJson.setTotal(vendorService.getProcurementsCountByUid(user.getUid()));
         ArrayList<Procurement> procurements = vendorService.getProcurementsByUid(user.getUid(), curr, nums);
         if (procurements == null) {
             procurements = new ArrayList<>();
         }
-        datasJson.setData(procurements);
-        return datasJson;
+        dataJson.setData(procurements);
+        return dataJson;
     }
 
     @RequestMapping(value = "/v/basic_info", method = RequestMethod.GET)
@@ -369,8 +375,13 @@ public class VendorController {
             resultJson.setMsg("id不能为空");
             return resultJson;
         }
-        int r = vendorService.deleteProcurement(id, user.getUid());
-        if (r > 0) {
+        Procurement r = vendorService.deleteProcurement(id, user.getUid());
+        if (r != null) {
+            String p_uid = r.getP_uid();
+            String p_email_address = userService.getEmailByUid(p_uid);
+            logger.info("find email >> uid: " + p_uid + ",  email: " + p_email_address);
+            String notice_content = r.getP_name() + "(email: " + user.getEmail() + ")" + "已取消采购(id: " + r.getPid() + ", 产品名:" + r.getProduct_name() + ", 数量: " + r.getAmount() + ")";
+            mailService.sendMailNotice(r.getV_name(), p_email_address, notice_content);
             resultJson.setCode(0);
             resultJson.setMsg("删除成功");
             resultJson.setData(null);

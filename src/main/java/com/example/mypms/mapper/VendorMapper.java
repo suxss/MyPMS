@@ -54,4 +54,6 @@ public interface VendorMapper {
     ArrayList<Procurement> getNeedActionProcurement(String v_uid);
 
     ArrayList<ProcurementDemand> getLatestDemands();
+
+    Procurement getProcurementByPid(String v_uid, int pid);
 }

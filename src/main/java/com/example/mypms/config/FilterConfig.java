@@ -2,16 +2,16 @@ package com.example.mypms.config;
 
 
 import com.example.mypms.filter.LogFilter;
+import com.example.mypms.service.LogService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import com.example.mypms.service.LogService;
 
 @Configuration
-public class FilterCongfig {
+public class FilterConfig {
     @Autowired
     LogService logService;
 

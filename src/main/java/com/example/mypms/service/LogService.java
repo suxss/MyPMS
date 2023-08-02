@@ -8,7 +8,7 @@ import org.springframework.stereotype.Service;
 @Service
 public class LogService {
     @Autowired
-    LogMapper logMapper;
+    private LogMapper logMapper;
 
     public int insertLog(String method, String path, String param, String ip, String uid) {
         RequestLog requestLog = new RequestLog(method, path, null, ip, uid);

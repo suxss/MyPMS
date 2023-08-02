@@ -2,7 +2,9 @@ package com.example.mypms.controller;
 
 import com.example.mypms.model.*;
 import com.example.mypms.service.FileManageService;
+import com.example.mypms.service.MailService;
 import com.example.mypms.service.PurchaserService;
+import com.example.mypms.service.UserService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,6 +31,10 @@ import static java.lang.Integer.parseInt;
 public class PurchaserController {
     @Autowired
     PurchaserService purchaserService;
+    @Autowired
+    UserService userService;
+    @Autowired
+    MailService mailService;
     @Autowired
     FileManageService fileManageService;
 
@@ -96,8 +102,8 @@ public class PurchaserController {
     }
 
     @RequestMapping(value = "/p/query/demands", method = RequestMethod.GET)
-    public DatasJson getDemandList(HttpServletRequest request, @RequestParam Map<String, Object> params) {
-        DatasJson datasJson = new DatasJson();
+    public DataJson getDemandList(HttpServletRequest request, @RequestParam Map<String, Object> params) {
+        DataJson dataJson = new DataJson();
         User user = (User) request.getSession().getAttribute("user");
         int curr, nums;
         try {
@@ -105,42 +111,42 @@ public class PurchaserController {
             nums = parseInt(params.get("nums").toString());
         } catch (NumberFormatException e) {
             logger.error("getDemandList >> curr or nums is not a number");
-            datasJson.setCode(-1);
-            datasJson.setMsg("页码或数量必须为数字");
-            datasJson.setTotal(0);
-            datasJson.setData(new ArrayList<>());
-            return datasJson;
+            dataJson.setCode(-1);
+            dataJson.setMsg("页码或数量必须为数字");
+            dataJson.setTotal(0);
+            dataJson.setData(new ArrayList<>());
+            return dataJson;
         } catch (NullPointerException e) {
             logger.error("getDemandList >> curr or nums is null");
-            datasJson.setCode(-1);
-            datasJson.setMsg("页码或数量不能为空");
-            datasJson.setTotal(0);
-            datasJson.setData(new ArrayList<>());
-            return datasJson;
+            dataJson.setCode(-1);
+            dataJson.setMsg("页码或数量不能为空");
+            dataJson.setTotal(0);
+            dataJson.setData(new ArrayList<>());
+            return dataJson;
         }
         if (user == null) {
             logger.error("getDemandList >> user is null");
-            datasJson.setCode(-1);
-            datasJson.setMsg("请先登录");
-            datasJson.setTotal(0);
-            datasJson.setData(new ArrayList<>());
-            return datasJson;
+            dataJson.setCode(-1);
+            dataJson.setMsg("请先登录");
+            dataJson.setTotal(0);
+            dataJson.setData(new ArrayList<>());
+            return dataJson;
         }
         logger.info("getDemandList >> curr:" + curr + ", nums: " + nums);
         ArrayList<ProcurementDemand> demands = purchaserService.getDemandsByUid(user.getUid(), curr, nums);
         if (demands == null) {
             demands = new ArrayList<>();
         }
-        datasJson.setData(demands);
-        datasJson.setCode(0);
-        datasJson.setMsg("获取成功");
-        datasJson.setTotal(purchaserService.getDemandsCountByUid(user.getUid()));
-        return datasJson;
+        dataJson.setData(demands);
+        dataJson.setCode(0);
+        dataJson.setMsg("获取成功");
+        dataJson.setTotal(purchaserService.getDemandsCountByUid(user.getUid()));
+        return dataJson;
     }
 
     @RequestMapping(value = "/p/query/quote", method = RequestMethod.GET)
-    public DatasJson getQuoteList(HttpServletRequest request, @RequestParam Map<String, Object> params) {
-        DatasJson datasJson = new DatasJson();
+    public DataJson getQuoteList(HttpServletRequest request, @RequestParam Map<String, Object> params) {
+        DataJson dataJson = new DataJson();
         User user = (User) request.getSession().getAttribute("user");
         int curr, nums, pdid;
         try {
@@ -149,42 +155,42 @@ public class PurchaserController {
             pdid = parseInt(params.get("id").toString());
         } catch (NumberFormatException e) {
             logger.error("getQuoteList >> curr or nums is not a number");
-            datasJson.setCode(-1);
-            datasJson.setMsg("页码或数量必须为数字");
-            datasJson.setTotal(0);
-            datasJson.setData(null);
-            return datasJson;
+            dataJson.setCode(-1);
+            dataJson.setMsg("页码或数量必须为数字");
+            dataJson.setTotal(0);
+            dataJson.setData(null);
+            return dataJson;
         } catch (NullPointerException e) {
             logger.error("getQuoteList >> curr or nums is null");
-            datasJson.setCode(-1);
-            datasJson.setMsg("页码或数量不能为空");
-            datasJson.setTotal(0);
-            datasJson.setData(new ArrayList<>());
-            return datasJson;
+            dataJson.setCode(-1);
+            dataJson.setMsg("页码或数量不能为空");
+            dataJson.setTotal(0);
+            dataJson.setData(new ArrayList<>());
+            return dataJson;
         }
         if (user == null) {
             logger.error("getQuoteList >> user is null");
-            datasJson.setCode(-1);
-            datasJson.setMsg("请先登录");
-            datasJson.setTotal(0);
-            datasJson.setData(new ArrayList<>());
-            return datasJson;
+            dataJson.setCode(-1);
+            dataJson.setMsg("请先登录");
+            dataJson.setTotal(0);
+            dataJson.setData(new ArrayList<>());
+            return dataJson;
         }
         logger.info("getQuoteList >> curr:" + curr + ", nums: " + nums);
         ArrayList<Quote> quotes = purchaserService.getQuotesByPdid(pdid, user.getUid(), curr, nums);
         if (quotes == null) {
             quotes = new ArrayList<>();
         }
-        datasJson.setData(quotes);
-        datasJson.setCode(0);
-        datasJson.setMsg("获取成功");
-        datasJson.setTotal(purchaserService.getQuotesCountByPdid(pdid, user.getUid()));
-        return datasJson;
+        dataJson.setData(quotes);
+        dataJson.setCode(0);
+        dataJson.setMsg("获取成功");
+        dataJson.setTotal(purchaserService.getQuotesCountByPdid(pdid, user.getUid()));
+        return dataJson;
     }
 
     @RequestMapping(value = "/p/query/processing", method = RequestMethod.GET)
-    public DatasJson getProcurementList(HttpServletRequest request, @RequestParam Map<String, Object> params) {
-        DatasJson datasJson = new DatasJson();
+    public DataJson getProcurementList(HttpServletRequest request, @RequestParam Map<String, Object> params) {
+        DataJson dataJson = new DataJson();
         User user = (User) request.getSession().getAttribute("user");
         int curr, nums;
         try {
@@ -192,37 +198,37 @@ public class PurchaserController {
             nums = parseInt(params.get("nums").toString());
         } catch (NumberFormatException e) {
             logger.error("getProcumentList >> curr or nums is not a number");
-            datasJson.setCode(-1);
-            datasJson.setMsg("页码或数量必须为数字");
-            datasJson.setTotal(0);
-            datasJson.setData(new ArrayList<>());
-            return datasJson;
+            dataJson.setCode(-1);
+            dataJson.setMsg("页码或数量必须为数字");
+            dataJson.setTotal(0);
+            dataJson.setData(new ArrayList<>());
+            return dataJson;
         } catch (NullPointerException e) {
             logger.error("getProcumentList >> curr or nums is null");
-            datasJson.setCode(-1);
-            datasJson.setMsg("页码或数量不能为空");
-            datasJson.setTotal(0);
-            datasJson.setData(new ArrayList<>());
-            return datasJson;
+            dataJson.setCode(-1);
+            dataJson.setMsg("页码或数量不能为空");
+            dataJson.setTotal(0);
+            dataJson.setData(new ArrayList<>());
+            return dataJson;
         }
         if (user == null) {
             logger.error("getProcumentList >> user is null");
-            datasJson.setCode(-1);
-            datasJson.setMsg("请先登录");
-            datasJson.setTotal(0);
-            datasJson.setData(new ArrayList<>());
-            return datasJson;
+            dataJson.setCode(-1);
+            dataJson.setMsg("请先登录");
+            dataJson.setTotal(0);
+            dataJson.setData(new ArrayList<>());
+            return dataJson;
         }
         logger.info("getProcumentList >> curr:" + curr + ", nums: " + nums);
         ArrayList<Procurement> procurements = purchaserService.getProcurementsByUid(user.getUid(), curr, nums);
         if (procurements == null) {
             procurements = new ArrayList<>();
         }
-        datasJson.setData(procurements);
-        datasJson.setCode(0);
-        datasJson.setMsg("获取成功");
-        datasJson.setTotal(purchaserService.getProcurementsCountByUid(user.getUid()));
-        return datasJson;
+        dataJson.setData(procurements);
+        dataJson.setCode(0);
+        dataJson.setMsg("获取成功");
+        dataJson.setTotal(purchaserService.getProcurementsCountByUid(user.getUid()));
+        return dataJson;
     }
 
     @RequestMapping(value = "/p/basic_info", method = RequestMethod.GET)
@@ -379,7 +385,6 @@ public class PurchaserController {
         try {
             fileManageService.fileUpload(file.getBytes(), newFilename);
         } catch (IOException e) {
-//            throw new RuntimeException(e);
             resultJson.setCode(-1);
             resultJson.setMsg("文件上传出错");
             return resultJson;
@@ -459,8 +464,12 @@ public class PurchaserController {
             resultJson.setMsg("id不能为空");
             return resultJson;
         }
-        int r = purchaserService.deleteProcurement(id, user.getUid());
-        if (r > 0) {
+        Procurement r = purchaserService.deleteProcurement(id, user.getUid());
+        if (r != null) {
+            String v_uid = r.getV_uid();
+            String v_email_address = userService.getEmailByUid(v_uid);
+            String notice_content = r.getP_name() + "(email: " + user.getEmail() + ")" + "已取消采购(id: " + r.getPid() + ", 产品名:" + r.getProduct_name() + ", 数量: " + r.getAmount() + ")";
+            mailService.sendMailNotice(r.getV_name(), v_email_address, notice_content);
             resultJson.setCode(0);
             resultJson.setMsg("删除成功");
             resultJson.setData(null);
@@ -611,6 +620,9 @@ public class PurchaserController {
             return resultJson;
         }
         StatusCount statusCount = purchaserService.getStatusCount(user.getUid());
+        if (statusCount == null) {
+            statusCount = new StatusCount();
+        }
         resultJson.setCode(0);
         resultJson.setMsg("查询成功");
         resultJson.setData(statusCount);
@@ -633,7 +645,7 @@ public class PurchaserController {
     }
 
     @RequestMapping(value = "/p/query/latest_quotes", method = RequestMethod.GET)
-    public ResultJson getLatestDemands(HttpServletRequest request) {
+    public ResultJson getLatestQuotes(HttpServletRequest request) {
         ResultJson resultJson = new ResultJson();
         User user = (User) request.getSession().getAttribute("user");
         if (user == null) {

@@ -67,6 +67,31 @@
         where qid = #{qid}
     </select>
 
+    <select id="getProcurementByPid" resultType="com.example.mypms.model.Procurement">
+        select pid,
+               qid,
+               pdid,
+               status,
+               start_time,
+               p_name,
+               p_uid,
+               v_uid,
+               v_name,
+               product_name,
+               amount,
+               total_price,
+               cname,
+               cpath,
+               cexpire_time,
+               remark
+        from processing
+        where v_uid = #{v_uid}
+          and pid = #{pid}
+          and status > 0
+          and 7 > processing.status
+        limit 1
+    </select>
+
     <select id="getProcurementsByUid" resultType="com.example.mypms.model.Procurement">
         select pid,
                qid,

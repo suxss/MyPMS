@@ -67,4 +67,6 @@ public interface PurchaserMapper {
     ArrayList<Procurement> getNeedActionProcurement(String p_uid);
 
     ArrayList<ProcurementDemand> getLatestQuotesByPid(String p_uid);
+
+    Procurement getProcurementByPid(String p_uid, int pid);
 }

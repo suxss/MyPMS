@@ -16,11 +16,20 @@
     </select>
 
     <insert id="insertPurchaser" parameterType="com.example.mypms.model.Purchaser">
-        insert into purchaser (uid, uname, email, pwd) values (#{uid}, #{uname}, #{email}, #{pwd})
+        insert into purchaser (uid, uname, email, pwd)
+        values (#{uid}, #{uname}, #{email}, #{pwd})
     </insert>
 
     <insert id="insertVendor" parameterType="com.example.mypms.model.Vendor">
-        insert into vendor (uid, uname, email, pwd, phone, address) values (#{uid}, #{uname}, #{email}, #{pwd}, #{phone}, #{address})
+        insert into vendor (uid, uname, email, pwd, phone, address)
+        values (#{uid}, #{uname}, #{email}, #{pwd}, #{phone}, #{address})
     </insert>
+
+    <select id="getEmailByUid" resultType="java.lang.String">
+        select email
+        from user
+        where uid = #{uid}
+        limit 1
+    </select>
 
 </mapper>

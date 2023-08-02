@@ -19,7 +19,7 @@ public class PurchaserService {
     @Value(value = "${file.expire_days}")
     private float EXPIRE_DAYS;
     @Autowired
-    PurchaserMapper purchaserMapper;
+    private PurchaserMapper purchaserMapper;
 
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
@@ -244,10 +244,12 @@ public class PurchaserService {
         return null;
     }
 
-    public int deleteProcurement(int pid, String uid) {
+    public Procurement deleteProcurement(int pid, String uid) {
         if (!isProcurementBelongToVendor(pid, uid))
-            return 0;
-        return purchaserMapper.deleteProcurement(pid);
+            return null;
+        Procurement procurement = purchaserMapper.getProcurementByPid(uid, pid);
+        purchaserMapper.deleteProcurement(pid);
+        return procurement;
     }
 
     private boolean isProcurementBelongToVendor(int pid, String uid) {
@@ -313,4 +315,5 @@ public class PurchaserService {
     public ArrayList<ProcurementDemand> getLatestQuotesByPid(String p_uid) {
         return purchaserMapper.getLatestQuotesByPid(p_uid);
     }
+
 }

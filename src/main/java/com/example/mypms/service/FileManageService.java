@@ -62,10 +62,10 @@ public class FileManageService {
     }
 
     public int deleteExpireContract() {
-        ArrayList<Integer> pids = fileMangeMapper.getExpireContractPid();
+        ArrayList<Integer> pids = getExpireContractPid();
         int count = 0;
         for (int pid : pids) {
-            String name = fileMangeMapper.getContractNameByPid(pid);
+            String name = getContractNameByPid(pid);
             deleteFile(name);
             count += fileMangeMapper.resetStatusByPid(pid);
         }

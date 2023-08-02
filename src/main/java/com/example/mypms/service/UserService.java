@@ -17,7 +17,7 @@ import java.util.ArrayList;
 @Service
 public class UserService implements UserDetailsService {
     @Autowired
-    UserMapper userMapper;
+    private UserMapper userMapper;
 
     public ArrayList<User> queryAllUser() {
         return userMapper.queryAllUser();
@@ -63,5 +63,9 @@ public class UserService implements UserDetailsService {
         vendor.setPhone(phone);
         vendor.setAddress(address);
         return userMapper.insertVendor(vendor);
+    }
+
+    public String getEmailByUid(String uid) {
+        return userMapper.getEmailByUid(uid);
     }
 }
