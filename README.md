@@ -92,10 +92,10 @@
 1. 前往 Release 页面下载最新版本的压缩包
 2. 解压压缩包，运行pms_localhost-dump.sql文件，创建数据库
 3. 修改application.yml文件中的数据库连接信息
-4. 运行如下命令
+4. 参照如下命令运行项目
 
 ```
-java -jar .\MyPMS.jar --spring.config.location=.\application.yml
+java -jar .\MyPMS-1.0.*.jar --spring.config.location=.\application.yml
 ```
 
 ### 源代码运行
@@ -104,6 +104,5 @@ java -jar .\MyPMS.jar --spring.config.location=.\application.yml
 2. 在MySQL中创建数据库pms，并导入项目根目录下的pms_localhost-dump.sql文件
 3. 修改application.yml文件中的数据库连接信息
 4. 运行MyPmsApplication.java文件
-
 ---
 项目中的图片资源均来自网络，如有侵权，请联系我删除

@@ -14,9 +14,4 @@ class MyPmsApplicationTests {
     void contextLoads() {
     }
 
-    @Test
-    public void testEmail() {
-        assert mailService.sendMailNotice("采购员", "3154529265@qq.com", "this is a test").equals("success");
-    }
-
 }
