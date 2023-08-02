@@ -79,11 +79,11 @@
 
 ## 开发环境
 
-| 工具            | 版本号      | 下载                                                                                 |
-|---------------|----------|------------------------------------------------------------------------------------|
-| IntelliJ IDEA | 2019.1.3 | [https://www.jetbrains.com/idea/download](https://www.jetbrains.com/idea/download) |
-| Navicat       | 12.1.19  | [http://www.formysql.com/xiazai.html](http://www.formysql.com/xiazai.html)         |
-| MySQL         | 8.0.16   | [https://www.mysql.com/](https://www.mysql.com/)                                   |
+| 工具            | 版本号    | 下载                                                                         |
+|---------------|--------|----------------------------------------------------------------------------|
+| IntelliJ IDEA | 2023.1 | [https://www.jetbrains.com/idea/](https://www.jetbrains.com/idea/)         |
+| DataGrip      | 2023.1 | [https://www.jetbrains.com/datagrip/](https://www.jetbrains.com/datagrip/) |
+| MySQL         | 8.0.25 | [https://www.mysql.com/](https://www.mysql.com/)                           |
 
 ## 开发指南
 
